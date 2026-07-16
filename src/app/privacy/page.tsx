@@ -71,7 +71,7 @@ export default function PrivacyPolicy() {
             </p>
             <ul className="list-disc pl-5 space-y-1">
               <li>All database submissions and uploaded FICA files are transmitted via secure SSL encryption.</li>
-              <li>Documents are housed within strictly secured, encrypted storage buckets on our Supabase cloud servers.</li>
+              <li>Documents are housed within strictly secured, encrypted storage buckets on our secure cloud servers.</li>
               <li>We enforce a zero-sharing policy: your data is never rented, sold, or distributed to third parties unless required by a court order or during standard deeds registry filings.</li>
             </ul>
           </div>

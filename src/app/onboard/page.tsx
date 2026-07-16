@@ -701,10 +701,10 @@ export default function Onboard() {
                           <div className="bg-primary/5 border border-primary/20 p-4 rounded-2xl flex gap-3 text-[11px] leading-relaxed text-muted-foreground font-sans mt-3 animate-fade-in">
                             <ShieldCheck className="h-4.5 w-4.5 text-primary shrink-0 mt-0.5" />
                             <div>
-                              <strong className="text-foreground block mb-0.5">Sandbox Sandbox Sandbox Sandbox Sandbox Sandbox</strong>
-                              Your files are saved inside your local browser memory sandbox because your Supabase Storage bucket <code>'fica-documents'</code> is not created yet. 
+                              <strong className="text-foreground block mb-0.5">Local Encrypted Sandbox Mode</strong>
+                              Your files are saved securely inside your local browser memory sandbox because cloud file storage is not configured yet. 
                               <br className="mb-2 block" />
-                              <strong className="text-foreground">To enable cloud uploads:</strong> Please open your Supabase Dashboard SQL Editor, copy and paste the contents of the <code>supabase_schema.sql</code> file, and run it to instantly configure your tables and storage buckets!
+                              <strong className="text-foreground">To enable cloud uploads:</strong> Please ensure your secure database storage buckets are correctly initialized and verified inside your backend database console!
                             </div>
                           </div>
                         )}

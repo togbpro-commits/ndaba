@@ -8,6 +8,22 @@ export default function Navbar() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Lock background body scroll when mobile drawer is open to prevent mobile overscroll
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (mobileMenuOpen) {
+        window.document.body.style.overflow = 'hidden';
+      } else {
+        window.document.body.style.overflow = '';
+      }
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.document.body.style.overflow = '';
+      }
+    };
+  }, [mobileMenuOpen]);
+
   // Initialize theme from localStorage on client-side mount (hydration-safe)
   useEffect(() => {
     if (typeof window !== 'undefined') {

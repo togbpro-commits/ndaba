@@ -635,7 +635,7 @@ export default function Home() {
             <span className="font-mono text-[10px] tracking-[0.25em] text-primary font-bold block uppercase">Live Status Tracking</span>
             <h2 className="font-serif text-3xl sm:text-4xl font-normal text-foreground">Digital Case Matter Tracker</h2>
             <p className="text-muted-foreground text-xs sm:text-sm max-w-lg mx-auto leading-relaxed">
-              Input your unique Case ID or Matter Number below to query live files, FICA approval checkpoints, or deeds registry registration status instantly from our Supabase servers.
+              Input your unique Case ID or Matter Number below to query live files, FICA approval checkpoints, or deeds registry registration status instantly from our secure cloud servers.
             </p>
             <div className="h-[1px] w-20 bg-primary mx-auto mt-4"></div>
           </div>

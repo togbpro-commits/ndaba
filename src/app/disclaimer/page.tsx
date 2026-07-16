@@ -66,7 +66,7 @@ export default function LegalDisclaimer() {
               <CheckCircle2 className="h-4.5 w-4.5 text-primary" /> 3. Verification & Case Tracker
             </h3>
             <p>
-              Our Digital Case Matter Tracker acts as a convenient convenience tool for active Ndabas Attorneys clients. While we strive to update case milestone statuses (File Opened, FICA Approved, Drafting, Lodged, Completed) on our Supabase servers, status lags may occur during heavy court or Deeds Registry schedules. Status tracking reports do not constitute formal registry certificates of registration.
+              Our Digital Case Matter Tracker acts as a convenient convenience tool for active Ndabas Attorneys clients. While we strive to update case milestone statuses (File Opened, FICA Approved, Drafting, Lodged, Completed) on our secure cloud servers, status lags may occur during heavy court or Deeds Registry schedules. Status tracking reports do not constitute formal registry certificates of registration.
             </p>
           </div>
         </section>
