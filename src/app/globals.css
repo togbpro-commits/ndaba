@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+:root {
+  /* Warm ivory and rich charcoal theme */
+  --background: #FAF8F6;
+  --foreground: #2A2530;
+  --card: #FFFFFF;
+  --card-foreground: #2A2530;
+  --border: #E5E1DD;
+  --primary: #B76E79; /* Rose Gold base */
+  --primary-foreground: #FFFFFF;
+  --lavender: #C3B1E1; /* Soft Lavender accent */
+  --muted: #807B85;
+  --muted-foreground: #99939D;
+  --accent: #E8C4C0; /* Light rose gold CTA gradient start */
+  --accent-foreground: #2A2530;
+  --font-serif: var(--font-serif), Georgia, serif;
+  --font-sans: var(--font-sans), system-ui, sans-serif;
+}
+
+.dark {
+  /* Deep plum-charcoal base */
+  --background: #1A1620;
+  --foreground: #EFEBF4;
+  --card: #231E2B; /* Lavender-tinted surface panels */
+  --card-foreground: #EFEBF4;
+  --border: #2D2738;
+  --primary: #E8C4C0; /* Rose Gold pops in dark mode */
+  --primary-foreground: #1A1620;
+  --lavender: #C3B1E1;
+  --muted: #423C4C;
+  --muted-foreground: #8F8895;
+  --accent: #B76E79;
+  --accent-foreground: #FFFFFF;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-lavender: var(--lavender);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
+}
+
+html, body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  margin: 0;
+  padding: 0;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6, .font-serif {
+  font-family: var(--font-serif);
+}
+
+/* Custom scrollbars matching the luxury legal aesthetic */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
