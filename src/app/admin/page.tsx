@@ -614,24 +614,24 @@ export default function AdminDashboard() {
       
       {/* LEFT SIDEBAR: Collapsible sidebar-07 template styling */}
       <aside className={`shrink-0 border-r border-border/60 bg-card select-none flex flex-col justify-between h-screen sticky top-0 transition-all duration-300 z-30 ${isSidebarCollapsed ? 'w-20' : 'w-64'}`}>
-        <div className="flex flex-col gap-6 p-4">
+        <div className={`flex flex-col gap-6 ${isSidebarCollapsed ? 'p-2' : 'p-4'}`}>
           {/* Brand Header */}
           <div className="flex items-center justify-between border-b border-border/40 pb-4 h-12">
             {!isSidebarCollapsed ? (
-              <a href="/" className="flex items-center gap-2 font-serif text-sm font-bold tracking-wide">
+              <a href="/" className="flex items-center gap-2 font-serif text-sm font-bold tracking-wide pl-2">
                 <Scale className="h-5 w-5 text-primary" />
-                <span className="bg-gradient-to-r from-primary to-lavender bg-clip-text text-transparent uppercase tracking-wider">NDABAS CRM</span>
+                <span className="bg-gradient-to-r from-primary to-lavender bg-clip-text text-transparent uppercase tracking-wider font-sans font-bold">NDABAS CRM</span>
               </a>
             ) : (
               <a href="/" className="mx-auto" title="Ndabas Attorneys CRM">
-                <Scale className="h-5 w-5 text-primary" />
+                <Scale className="h-5.5 w-5.5 text-primary animate-none" />
               </a>
             )}
             
             {/* Collapse Toggle trigger */}
             <button 
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              className="p-1.5 hover:bg-border/30 border border-border/60 rounded-lg text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+              className="p-1.5 hover:bg-border/30 border border-border/60 rounded-lg text-muted-foreground hover:text-foreground cursor-pointer transition-colors shrink-0"
               title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
             >
               {isSidebarCollapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
@@ -639,74 +639,126 @@ export default function AdminDashboard() {
           </div>
 
           {/* Sidebar Tabs Links */}
-          <nav className="flex flex-col gap-1.5 text-xs font-bold tracking-wider">
-            <button
-              onClick={() => { setActiveTab('leads'); setSearchQuery(''); }}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer text-left ${activeTab === 'leads' ? 'bg-primary/10 text-primary border border-primary/15 font-bold' : 'text-muted-foreground hover:text-foreground hover:bg-border/20 border border-transparent'}`}
-            >
-              <Users className="h-4 w-4 shrink-0" />
-              {!isSidebarCollapsed && <span>LEADS PIPELINE</span>}
-            </button>
-
-            <button
-              onClick={() => { setActiveTab('cases'); setSearchQuery(''); }}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer text-left ${activeTab === 'cases' ? 'bg-primary/10 text-primary border border-primary/15 font-bold' : 'text-muted-foreground hover:text-foreground hover:bg-border/20 border border-transparent'}`}
-            >
-              <Briefcase className="h-4 w-4 shrink-0" />
-              {!isSidebarCollapsed && <span>CASE TRACKER</span>}
-            </button>
-
-            <button
-              onClick={() => { setActiveTab('clients'); setSearchQuery(''); }}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer text-left ${activeTab === 'clients' ? 'bg-primary/10 text-primary border border-primary/15 font-bold' : 'text-muted-foreground hover:text-foreground hover:bg-border/20 border border-transparent'}`}
-            >
-              <Users className="h-4 w-4 shrink-0" />
-              {!isSidebarCollapsed && <span>CLIENT DIRECTORY</span>}
-            </button>
-
-            <button
-              onClick={() => { setActiveTab('calendar'); setSearchQuery(''); }}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer text-left ${activeTab === 'calendar' ? 'bg-primary/10 text-primary border border-primary/15 font-bold' : 'text-muted-foreground hover:text-foreground hover:bg-border/20 border border-transparent'}`}
-            >
-              <Calendar className="h-4 w-4 shrink-0" />
-              {!isSidebarCollapsed && (
-                <div className="flex justify-between items-center w-full">
-                  <span>MEETINGS</span>
-                  {consultations.length > 0 && (
-                    <span className="bg-primary/15 text-primary text-[9px] px-1.5 py-0.5 rounded font-bold">{consultations.length}</span>
-                  )}
+          <nav className="flex flex-col gap-3 text-xs font-bold tracking-wider">
+            {/* 1. Leads Pipeline Tab */}
+            <div className="relative group flex justify-center w-full">
+              <button
+                onClick={() => { setActiveTab('leads'); setSearchQuery(''); }}
+                className={`flex items-center gap-3 py-3 rounded-xl transition-all cursor-pointer ${isSidebarCollapsed ? 'justify-center px-0 w-12 mx-auto' : 'px-4 text-left w-full'} ${activeTab === 'leads' ? 'bg-primary/10 text-primary border border-primary/15 font-bold shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-border/20 border border-transparent'}`}
+              >
+                <Users className="h-4.5 w-4.5 shrink-0" />
+                {!isSidebarCollapsed && <span className="font-sans">LEADS PIPELINE</span>}
+              </button>
+              {isSidebarCollapsed && (
+                <div className="absolute left-16 top-1/2 -translate-y-1/2 bg-zinc-900 text-white font-mono text-[9px] tracking-widest font-bold px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none shadow-lg whitespace-nowrap z-50 border border-border/20">
+                  LEADS PIPELINE
                 </div>
               )}
-            </button>
+            </div>
 
-            <button
-              onClick={() => { setActiveTab('reports'); setSearchQuery(''); }}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer text-left ${activeTab === 'reports' ? 'bg-primary/10 text-primary border border-primary/15 font-bold' : 'text-muted-foreground hover:text-foreground hover:bg-border/20 border border-transparent'}`}
-            >
-              <TrendingUp className="h-4 w-4 shrink-0" />
-              {!isSidebarCollapsed && <span>ANALYTICS & POPIA</span>}
-            </button>
+            {/* 2. Case Tracker Tab */}
+            <div className="relative group flex justify-center w-full">
+              <button
+                onClick={() => { setActiveTab('cases'); setSearchQuery(''); }}
+                className={`flex items-center gap-3 py-3 rounded-xl transition-all cursor-pointer ${isSidebarCollapsed ? 'justify-center px-0 w-12 mx-auto' : 'px-4 text-left w-full'} ${activeTab === 'cases' ? 'bg-primary/10 text-primary border border-primary/15 font-bold shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-border/20 border border-transparent'}`}
+              >
+                <Briefcase className="h-4.5 w-4.5 shrink-0" />
+                {!isSidebarCollapsed && <span className="font-sans">CASE TRACKER</span>}
+              </button>
+              {isSidebarCollapsed && (
+                <div className="absolute left-16 top-1/2 -translate-y-1/2 bg-zinc-900 text-white font-mono text-[9px] tracking-widest font-bold px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none shadow-lg whitespace-nowrap z-50 border border-border/20">
+                  CASE TRACKER
+                </div>
+              )}
+            </div>
+
+            {/* 3. Client Directory Tab */}
+            <div className="relative group flex justify-center w-full">
+              <button
+                onClick={() => { setActiveTab('clients'); setSearchQuery(''); }}
+                className={`flex items-center gap-3 py-3 rounded-xl transition-all cursor-pointer ${isSidebarCollapsed ? 'justify-center px-0 w-12 mx-auto' : 'px-4 text-left w-full'} ${activeTab === 'clients' ? 'bg-primary/10 text-primary border border-primary/15 font-bold shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-border/20 border border-transparent'}`}
+              >
+                <Users className="h-4.5 w-4.5 shrink-0" />
+                {!isSidebarCollapsed && <span className="font-sans">CLIENT DIRECTORY</span>}
+              </button>
+              {isSidebarCollapsed && (
+                <div className="absolute left-16 top-1/2 -translate-y-1/2 bg-zinc-900 text-white font-mono text-[9px] tracking-widest font-bold px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none shadow-lg whitespace-nowrap z-50 border border-border/20">
+                  CLIENT DIRECTORY
+                </div>
+              )}
+            </div>
+
+            {/* 4. Meetings Calendar Tab */}
+            <div className="relative group flex justify-center w-full">
+              <button
+                onClick={() => { setActiveTab('calendar'); setSearchQuery(''); }}
+                className={`flex items-center gap-3 py-3 rounded-xl transition-all cursor-pointer ${isSidebarCollapsed ? 'justify-center px-0 w-12 mx-auto' : 'px-4 text-left w-full'} ${activeTab === 'calendar' ? 'bg-primary/10 text-primary border border-primary/15 font-bold shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-border/20 border border-transparent'}`}
+              >
+                <Calendar className="h-4.5 w-4.5 shrink-0" />
+                {!isSidebarCollapsed ? (
+                  <div className="flex justify-between items-center w-full font-sans">
+                    <span>MEETINGS</span>
+                    {consultations.length > 0 && (
+                      <span className="bg-primary/15 text-primary text-[9px] px-1.5 py-0.5 rounded font-bold font-mono">{consultations.length}</span>
+                    )}
+                  </div>
+                ) : (
+                  consultations.length > 0 && (
+                    <div className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-primary animate-ping"></div>
+                  )
+                )}
+              </button>
+              {isSidebarCollapsed && (
+                <div className="absolute left-16 top-1/2 -translate-y-1/2 bg-zinc-900 text-white font-mono text-[9px] tracking-widest font-bold px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none shadow-lg whitespace-nowrap z-50 border border-border/20">
+                  MEETINGS SCHEDULER
+                </div>
+              )}
+            </div>
+
+            {/* 5. Reports Tab */}
+            <div className="relative group flex justify-center w-full">
+              <button
+                onClick={() => { setActiveTab('reports'); setSearchQuery(''); }}
+                className={`flex items-center gap-3 py-3 rounded-xl transition-all cursor-pointer ${isSidebarCollapsed ? 'justify-center px-0 w-12 mx-auto' : 'px-4 text-left w-full'} ${activeTab === 'reports' ? 'bg-primary/10 text-primary border border-primary/15 font-bold shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-border/20 border border-transparent'}`}
+              >
+                <TrendingUp className="h-4.5 w-4.5 shrink-0" />
+                {!isSidebarCollapsed && <span className="font-sans">ANALYTICS & POPIA</span>}
+              </button>
+              {isSidebarCollapsed && (
+                <div className="absolute left-16 top-1/2 -translate-y-1/2 bg-zinc-900 text-white font-mono text-[9px] tracking-widest font-bold px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none shadow-lg whitespace-nowrap z-50 border border-border/20">
+                  ANALYTICS & POPIA
+                </div>
+              )}
+            </div>
           </nav>
         </div>
 
         {/* Sidebar Footer: Theme toggle and profile */}
-        <div className="p-4 border-t border-border/40 flex flex-col gap-3">
+        <div className={`border-t border-border/40 flex flex-col gap-3 ${isSidebarCollapsed ? 'p-2' : 'p-4'}`}>
           {/* Quick theme trigger inside sidebar */}
-          <button 
-            onClick={toggleTheme}
-            type="button"
-            className="w-full flex items-center justify-center gap-2.5 py-2 px-3 hover:bg-border/20 border border-border/60 rounded-xl text-muted-foreground hover:text-foreground transition-all cursor-pointer font-mono text-[9px] font-bold"
-            title={theme === 'dark' ? 'Light Theme' : 'Dark Theme'}
-          >
-            {theme === 'dark' ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-            {!isSidebarCollapsed && <span>{theme === 'dark' ? 'LIGHT THEME' : 'DARK THEME'}</span>}
-          </button>
+          <div className="relative group flex justify-center w-full">
+            <button 
+              onClick={toggleTheme}
+              type="button"
+              className={`w-full flex items-center gap-2.5 py-2 hover:bg-border/20 border border-border/60 rounded-xl text-muted-foreground hover:text-foreground transition-all cursor-pointer font-mono text-[9px] font-bold ${isSidebarCollapsed ? 'justify-center px-0 h-10 w-12 mx-auto' : 'px-3'}`}
+            >
+              {theme === 'dark' ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+              {!isSidebarCollapsed && <span>{theme === 'dark' ? 'LIGHT MODE' : 'DARK MODE'}</span>}
+            </button>
+            {isSidebarCollapsed && (
+              <div className="absolute left-16 top-1/2 -translate-y-1/2 bg-zinc-900 text-white font-mono text-[9px] tracking-widest font-bold px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none shadow-lg whitespace-nowrap z-50 border border-border/20">
+                TOGGLE THEME
+              </div>
+            )}
+          </div>
 
           {/* User profile widget */}
-          <div className="flex items-center justify-between gap-3 h-10 px-1">
-            <UserButton />
+          <div className={`flex items-center h-10 w-full ${isSidebarCollapsed ? 'justify-center mx-auto' : 'gap-3 px-1'}`}>
+            <div className={isSidebarCollapsed ? 'scale-110 flex items-center justify-center' : 'shrink-0'}>
+              <UserButton />
+            </div>
             {!isSidebarCollapsed && (
-              <div className="truncate text-left flex-grow max-w-[140px]">
+              <div className="truncate text-left flex-grow max-w-[140px] font-sans">
                 <span className="font-bold text-foreground text-xs block truncate leading-none">{user?.fullName || 'Counselor'}</span>
                 <span className="text-muted-foreground text-[8px] font-mono uppercase tracking-wider block mt-1">Authorized Staff</span>
               </div>
