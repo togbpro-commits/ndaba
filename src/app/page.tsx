@@ -53,11 +53,63 @@ export default function Home() {
     setTrackedCase(null);
     setIsTracking(true);
 
+    const enteredId = trackerCaseId.trim().toLowerCase();
+
+    // Check for demo IDs first
+    if (enteredId === 'case-1') {
+      setTrackedCase({
+        id: 'case-1',
+        case_number: 'NDB-2026-CASE1',
+        client_name: 'Sipho Zuma',
+        case_title: 'Property Transfer (Erf 402, Hammanskraal)',
+        status: 'In Progress',
+        practice_area: 'Conveyancing',
+        key_dates: 'Deeds Office Lodgement: 2026-07-28',
+        created_at: new Date().toISOString(),
+        documents: [
+          { name: 'ID_Copy_Zuma.pdf', url: '#', size: '1.2 MB', status: 'Approved', uploaded_at: new Date().toISOString() },
+          { name: 'Proof_Of_Address_Zuma.pdf', url: '#', size: '0.8 MB', status: 'Approved', uploaded_at: new Date().toISOString() }
+        ]
+      });
+      setIsTracking(false);
+      return;
+    } else if (enteredId === 'case-2') {
+      setTrackedCase({
+        id: 'case-2',
+        case_number: 'NDB-2026-CASE2',
+        client_name: 'Lerato & Kabelo Modise',
+        case_title: 'Antenuptial Contract (Marriage Out of Community)',
+        status: 'Awaiting Documents',
+        practice_area: 'Notary Services',
+        key_dates: 'Signing Appointment: 2026-07-22 @ 11:30',
+        created_at: new Date().toISOString(),
+        documents: [
+          { name: 'Draft_ANC_Contract.pdf', url: '#', size: '2.1 MB', status: 'Pending', uploaded_at: new Date().toISOString() }
+        ]
+      });
+      setIsTracking(false);
+      return;
+    } else if (enteredId === 'case-3') {
+      setTrackedCase({
+        id: 'case-3',
+        case_number: 'NDB-2026-CASE3',
+        client_name: 'Mokoena Holdings Pty Ltd',
+        case_title: 'Partnership Dispute Resolution',
+        status: 'Open',
+        practice_area: 'Attorneys & Litigation',
+        key_dates: 'Pre-trial Conference: 2026-08-05',
+        created_at: new Date().toISOString(),
+        documents: []
+      });
+      setIsTracking(false);
+      return;
+    }
+
     try {
       const casesList = await db.getCases();
       const match = casesList.find(c => 
-        (c.case_number && c.case_number.toLowerCase() === trackerCaseId.trim().toLowerCase()) ||
-        (c.id.toLowerCase() === trackerCaseId.trim().toLowerCase())
+        (c.case_number && c.case_number.toLowerCase() === enteredId) ||
+        (c.id.toLowerCase() === enteredId)
       );
       
       if (match) {

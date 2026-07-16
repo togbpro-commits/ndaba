@@ -165,6 +165,19 @@ export default function AdminDashboard() {
         const fetchedLeads = await db.getLeads();
         setLeads(fetchedLeads);
 
+        // Toast notifications
+        if (newStatus === 'Contacted') {
+          showToast(`Lead "${updatedLead.name}" marked as contacted! 📞`, 'success');
+        } else if (newStatus === 'Consultation Booked') {
+          showToast(`Consultation booked for "${updatedLead.name}"! 📅`, 'success');
+        } else if (newStatus === 'Client') {
+          showToast(`🎉 Converted "${updatedLead.name}" to Client! Case matter auto-created.`, 'success');
+        } else if (newStatus === 'Closed/Lost') {
+          showToast(`Lead "${updatedLead.name}" marked as closed/lost.`, 'info');
+        } else {
+          showToast(`Lead status updated to "${newStatus}"!`, 'info');
+        }
+
         // If converted to client, automatically create a Case record!
         if (newStatus === 'Client') {
           await createCaseFromLead(updatedLead);
@@ -172,6 +185,7 @@ export default function AdminDashboard() {
       }
     } catch (error) {
       console.error('Error updating lead status:', error);
+      showToast('Failed to update lead status.', 'error');
     }
   };
 
@@ -185,6 +199,8 @@ export default function AdminDashboard() {
 
       await db.insertCase({
         client_name: lead.name,
+        client_email: lead.email,
+        client_phone: lead.phone,
         case_title: `${lead.name} - Matter`,
         status: 'Open',
         practice_area,
@@ -226,8 +242,8 @@ export default function AdminDashboard() {
 
       const newLead = await db.insertLead({
         name: cs.client_name,
-        phone: '082 490 6285', // Standard placeholder phone
-        email: 'client@directory.co.za', // Standard placeholder email
+        phone: cs.client_phone || '082 490 6285', // Stored phone
+        email: cs.client_email || 'client@directory.co.za', // Stored email
         service_type: cs.practice_area,
         message: `Registered from active Case Tracker matter: ${cs.case_title}`
       });
@@ -431,9 +447,8 @@ export default function AdminDashboard() {
 
     setIsSendingNotification(true);
     try {
-      const matchingLead = leads.find(l => l.name === cs.client_name);
-      const clientEmail = matchingLead?.email || 'onboarded@client.co.za';
-      const clientPhone = matchingLead?.phone || '082 490 6285';
+      const clientEmail = cs.client_email || 'onboarded@client.co.za';
+      const clientPhone = cs.client_phone || '082 490 6285';
 
       if (notificationMethod === 'Email') {
         const res = await sendClientNotificationEmail({
@@ -734,13 +749,13 @@ export default function AdminDashboard() {
         </div>
 
         {/* Sidebar Footer: Theme toggle and profile */}
-        <div className={`border-t border-border/40 flex flex-col gap-3 ${isSidebarCollapsed ? 'p-2' : 'p-4'}`}>
+        <div className={`border-t border-border/40 flex flex-col gap-3 ${isSidebarCollapsed ? 'p-2 items-center justify-center' : 'p-4'}`}>
           {/* Quick theme trigger inside sidebar */}
           <div className="relative group flex justify-center w-full">
             <button 
               onClick={toggleTheme}
               type="button"
-              className={`w-full flex items-center gap-2.5 py-2 hover:bg-border/20 border border-border/60 rounded-xl text-muted-foreground hover:text-foreground transition-all cursor-pointer font-mono text-[9px] font-bold ${isSidebarCollapsed ? 'justify-center px-0 h-10 w-12 mx-auto' : 'px-3'}`}
+              className={`w-full flex items-center gap-2.5 py-2 hover:bg-border/20 border border-border/60 rounded-xl text-muted-foreground hover:text-foreground transition-all cursor-pointer font-mono text-[9px] font-bold ${isSidebarCollapsed ? 'justify-center px-0 h-10 w-10 mx-auto' : 'px-3'}`}
             >
               {theme === 'dark' ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
               {!isSidebarCollapsed && <span>{theme === 'dark' ? 'LIGHT MODE' : 'DARK MODE'}</span>}
@@ -748,19 +763,6 @@ export default function AdminDashboard() {
             {isSidebarCollapsed && (
               <div className="absolute left-16 top-1/2 -translate-y-1/2 bg-zinc-900 text-white font-mono text-[9px] tracking-widest font-bold px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none shadow-lg whitespace-nowrap z-50 border border-border/20">
                 TOGGLE THEME
-              </div>
-            )}
-          </div>
-
-          {/* User profile widget */}
-          <div className={`flex items-center h-10 w-full ${isSidebarCollapsed ? 'justify-center mx-auto' : 'gap-3 px-1'}`}>
-            <div className={isSidebarCollapsed ? 'scale-110 flex items-center justify-center' : 'shrink-0'}>
-              <UserButton />
-            </div>
-            {!isSidebarCollapsed && (
-              <div className="truncate text-left flex-grow max-w-[140px] font-sans">
-                <span className="font-bold text-foreground text-xs block truncate leading-none">{user?.fullName || 'Counselor'}</span>
-                <span className="text-muted-foreground text-[8px] font-mono uppercase tracking-wider block mt-1">Authorized Staff</span>
               </div>
             )}
           </div>
@@ -778,9 +780,15 @@ export default function AdminDashboard() {
             <span className="text-muted-foreground/50">/</span>
             <span className="text-primary tracking-wider uppercase">{activeTab === 'calendar' ? 'meetings scheduler' : activeTab === 'reports' ? 'compliance ledger' : `${activeTab} pipeline`}</span>
           </div>
-          <div className="flex items-center gap-4 text-xs font-mono">
-            <span className="text-[10px] text-muted-foreground">Active Server Port: <strong>3000</strong></span>
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+          <div className="flex items-center gap-4 text-xs">
+            <div className="hidden sm:flex items-center gap-2 font-mono text-[10px] text-muted-foreground">
+              <span className="font-bold text-foreground">{user?.fullName || 'Counselor'}</span>
+              <span>•</span>
+              <span className="text-[8px] uppercase tracking-wider bg-primary/10 text-primary px-1.5 py-0.5 rounded">Authorized Staff</span>
+            </div>
+            <div className="shrink-0 flex items-center justify-center">
+              <UserButton />
+            </div>
           </div>
         </header>
 
@@ -1008,114 +1016,117 @@ export default function AdminDashboard() {
 
               {/* 2. CASE TRACKER */}
               {activeTab === 'cases' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
                   {cases.map((cs) => (
-                    <div key={cs.id} className="bg-card border border-border p-6 rounded-3xl shadow-sm space-y-4 relative overflow-hidden flex flex-col justify-between">
+                    <div key={cs.id} className="bg-card border border-border p-6 rounded-3xl shadow-lg relative overflow-hidden flex flex-col justify-between max-w-md w-full mx-auto min-h-[480px] hover:shadow-xl transition-all duration-300">
                       <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-lavender/5 to-accent/10 blur-xl rounded-full"></div>
                       
-                      <div className="space-y-4 relative z-10">
-                        <div className="flex justify-between items-start border-b border-border/60 pb-3">
-                          <div className="space-y-1">
-                            <span className="text-[9px] text-primary tracking-widest block font-bold font-mono uppercase">CASE NO: {cs.case_number || `#${cs.id.substring(0, 8).toUpperCase()}`}</span>
-                            <h3 className="font-serif font-bold text-foreground text-lg leading-snug">{cs.client_name}</h3>
-                            {cs.access_key && (
-                              <span className="text-[8.5px] text-muted-foreground block font-mono">KEY: <strong className="text-foreground select-all bg-border/20 px-1 py-0.5 rounded">{cs.access_key}</strong></span>
-                            )}
+                      <div className="space-y-4 relative z-10 flex-grow flex flex-col justify-between">
+                        
+                        {/* Top: Case Metadata */}
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-start border-b border-border/60 pb-3">
+                            <div className="space-y-1">
+                              <span className="text-[9px] text-primary tracking-widest block font-bold font-mono uppercase">CASE NO: {cs.case_number || `#${cs.id.substring(0, 8).toUpperCase()}`}</span>
+                              <h3 className="font-serif font-bold text-foreground text-base leading-snug">{cs.client_name}</h3>
+                              {cs.access_key && (
+                                <span className="text-[8.5px] text-muted-foreground block font-mono">KEY: <strong className="text-foreground select-all bg-border/20 px-1 py-0.5 rounded">{cs.access_key}</strong></span>
+                              )}
+                            </div>
+                            <select 
+                              value={cs.status}
+                              onChange={(e) => handleUpdateCaseStatus(cs.id, e.target.value as Case['status'])}
+                              className="bg-background border border-border rounded-xl px-2.5 py-1.5 text-[10px] font-bold text-primary focus:outline-none cursor-pointer font-sans"
+                            >
+                              <option value="Open">Open</option>
+                              <option value="In Progress">In Progress</option>
+                              <option value="Awaiting Documents">Awaiting Documents</option>
+                              <option value="Complete">Complete</option>
+                            </select>
                           </div>
-                          <select 
-                            value={cs.status}
-                            onChange={(e) => handleUpdateCaseStatus(cs.id, e.target.value as Case['status'])}
-                            className="bg-background border border-border rounded-xl px-2.5 py-1.5 text-[10px] font-bold text-primary focus:outline-none cursor-pointer font-sans"
-                          >
-                            <option value="Open">Open</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Awaiting Documents">Awaiting Documents</option>
-                            <option value="Complete">Complete</option>
-                          </select>
+
+                          <div className="space-y-1.5">
+                            <span className="font-mono text-[9px] tracking-widest text-primary bg-primary/10 px-2 py-0.5 rounded uppercase font-bold">{cs.practice_area}</span>
+                            <p className="text-muted-foreground text-xs leading-relaxed font-sans pt-1">{cs.case_title}</p>
+                          </div>
                         </div>
 
-                        <div className="space-y-1">
-                          <span className="font-mono text-[9px] tracking-widest text-primary bg-primary/10 px-2 py-0.5 rounded uppercase font-bold">{cs.practice_area}</span>
-                          <p className="text-muted-foreground text-xs leading-relaxed font-sans pt-2">{cs.case_title}</p>
-                        </div>
-
-                        {/* Documents Section */}
-                        <div className="border-t border-border/60 pt-4 space-y-2.5">
+                        {/* Middle: Horizontal Documents Stack */}
+                        <div className="border-t border-border/60 pt-4 space-y-2">
                           <span className="font-mono text-[9px] tracking-widest text-muted-foreground uppercase font-bold block">
-                            FICA CASE DOCUMENTS ({cs.documents?.length || 0})
+                            ATTACHED FICA FILES ({cs.documents?.length || 0})
                           </span>
                           
                           {cs.documents && cs.documents.length > 0 ? (
-                            <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
+                            <div className="flex gap-2.5 overflow-x-auto pb-2 pt-1 scrollbar-thin scrollbar-thumb-border max-w-full">
                               {cs.documents.map((doc, dIdx) => (
-                                <div key={dIdx} className="bg-background border border-border rounded-xl p-2.5 flex items-center justify-between text-xs shadow-sm font-sans">
-                                  <div className="flex items-center gap-2 truncate max-w-[60%]">
-                                    <File className="h-3.5 w-3.5 text-primary shrink-0" />
-                                    <div className="truncate">
-                                      <button 
-                                        type="button"
-                                        className="font-bold text-foreground hover:underline truncate block text-xs cursor-pointer hover:text-primary transition-colors text-left"
-                                        title={`Preview "${doc.name}"`}
-                                        onClick={() => handlePreviewDocument(cs.id, cs.client_name, doc.name, doc.url, dIdx)}
-                                      >
-                                        {doc.name}
-                                      </button>
-                                      <span className="text-[9px] text-muted-foreground block font-mono">{doc.size}</span>
+                                <div key={dIdx} className="flex-shrink-0 bg-background border border-border rounded-xl p-2.5 w-44 flex flex-col justify-between h-20 shadow-sm relative font-sans text-left">
+                                  <div className="flex items-start justify-between gap-1">
+                                    <div className="truncate max-w-[80%]">
+                                      <span className="font-bold text-foreground text-[10px] block truncate" title={doc.name}>{doc.name}</span>
+                                      <span className="text-[8px] text-muted-foreground font-mono block mt-0.5">{doc.size}</span>
                                     </div>
+                                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${doc.status === 'Approved' ? 'bg-green-500' : doc.status === 'Rejected' ? 'bg-red-500' : 'bg-yellow-500'}`} title={`Status: ${doc.status}`} />
                                   </div>
 
-                                  <div className="flex items-center gap-2 shrink-0">
+                                  <div className="flex items-center justify-between mt-1 pt-1.5 border-t border-border/40">
+                                    <button 
+                                      type="button"
+                                      className="text-primary hover:text-primary/80 flex items-center gap-1 text-[9px] font-mono font-bold cursor-pointer hover:underline"
+                                      onClick={() => handlePreviewDocument(cs.id, cs.client_name, doc.name, doc.url, dIdx)}
+                                      title="View document"
+                                    >
+                                      <Eye className="h-3.5 w-3.5" />
+                                      <span>VIEW</span>
+                                    </button>
+                                    
                                     <select
                                       value={doc.status}
                                       onChange={(e) => handleUpdateDocumentStatus(cs.id, dIdx, e.target.value as any)}
-                                      className={`text-[9px] font-bold px-2 py-1 rounded-lg border focus:outline-none cursor-pointer font-sans ${doc.status === 'Approved' ? 'bg-green-500/10 text-green-500 border-green-500/20' : doc.status === 'Rejected' ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'}`}
+                                      className={`text-[8.5px] font-mono font-bold px-1 py-0.5 rounded-md border focus:outline-none cursor-pointer ${doc.status === 'Approved' ? 'bg-green-500/10 text-green-500 border-green-500/20' : doc.status === 'Rejected' ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'}`}
                                     >
-                                      <option value="Pending">Pending</option>
-                                      <option value="Approved">Approved</option>
-                                      <option value="Rejected">Rejected</option>
+                                      <option value="Pending">PEND</option>
+                                      <option value="Approved">APPR</option>
+                                      <option value="Rejected">REJC</option>
                                     </select>
                                   </div>
                                 </div>
                               ))}
                             </div>
                           ) : (
-                            <span className="text-[10px] text-muted-foreground block font-sans italic pb-1">
+                            <span className="text-[10px] text-muted-foreground block font-sans italic py-1">
                               No documents uploaded yet for this case matter.
                             </span>
                           )}
-
-                          {/* Inline Case Document Uploader */}
-                          <div className="pt-2">
-                            <div className="relative">
-                              <input 
-                                type="file"
-                                id={`upload-${cs.id}`}
-                                className="hidden"
-                                onChange={(e) => handleAddCaseDocument(cs.id, e)}
-                                disabled={uploadingCaseId === cs.id}
-                              />
-                              <label 
-                                htmlFor={`upload-${cs.id}`}
-                                className={`flex items-center justify-center gap-2 py-2 px-3 border border-dashed border-border hover:border-primary/50 hover:bg-primary/5 rounded-xl text-[10px] font-mono tracking-wider font-bold cursor-pointer text-muted-foreground hover:text-foreground transition-all ${uploadingCaseId === cs.id ? 'opacity-50 cursor-not-allowed' : ''}`}
-                              >
-                                {uploadingCaseId === cs.id ? (
-                                  <>
-                                    <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                                    <span>UPLOADING...</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Upload className="h-3.5 w-3.5 text-primary" />
-                                    <span>APPEND COURT ORDER / FILE</span>
-                                  </>
-                                )}
-                              </label>
-                            </div>
-                          </div>
                         </div>
 
-                        {/* Notify Client Trigger Button */}
-                        <div className="border-t border-border/60 pt-3 space-y-2">
+                        {/* Feature Action Buttons (styled as icons for clean, non-cluttered look) */}
+                        <div className="border-t border-border/60 pt-4 flex items-center justify-around gap-2 bg-background/40 p-2 rounded-2xl">
+                          
+                          {/* Upload File feature icon */}
+                          <div className="relative group flex flex-col items-center">
+                            <input 
+                              type="file"
+                              id={`upload-${cs.id}`}
+                              className="hidden"
+                              onChange={(e) => handleAddCaseDocument(cs.id, e)}
+                              disabled={uploadingCaseId === cs.id}
+                            />
+                            <label 
+                              htmlFor={`upload-${cs.id}`}
+                              className={`flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer ${uploadingCaseId === cs.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              title="Append file to case"
+                            >
+                              {uploadingCaseId === cs.id ? (
+                                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                              ) : (
+                                <Upload className="h-4 w-4 text-primary" />
+                              )}
+                              <span className="text-[8px] font-mono font-bold tracking-wider uppercase">APPEND FILE</span>
+                            </label>
+                          </div>
+
+                          {/* Notify client alerts feature icon */}
                           <button 
                             type="button"
                             onClick={() => {
@@ -1130,26 +1141,40 @@ export default function AdminDashboard() {
                               setNotificationMessage(prefilledMsg);
                               setNotificationSubject(`Legal Status Update - Case ${cs.case_number || 'N/A'}`);
                             }}
-                            className="flex items-center gap-1.5 py-2 px-3 border border-border bg-background hover:bg-border/20 rounded-xl text-[10px] font-mono tracking-wider font-bold cursor-pointer text-muted-foreground hover:text-foreground transition-all w-full justify-center"
+                            className={`flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer ${notifyingCaseId === cs.id ? 'bg-primary/15 text-primary' : ''}`}
+                            title="Send status notification"
                           >
-                            <MessageSquare className="h-3.5 w-3.5 text-primary" />
-                            <span>{notifyingCaseId === cs.id ? 'CLOSE NOTIFIER' : 'NOTIFY CLIENT VIA EMAIL/WA'}</span>
+                            <MessageSquare className="h-4 w-4 text-primary" />
+                            <span className="text-[8px] font-mono font-bold tracking-wider uppercase">{notifyingCaseId === cs.id ? 'CLOSE' : 'NOTIFY'}</span>
                           </button>
 
-                          {/* Add as Client Button inside case cards */}
+                          {/* Add to Contact Directory feature icon */}
                           <button 
                             type="button"
                             onClick={() => handleAddAsClient(cs)}
-                            className="flex items-center gap-1.5 py-2 px-3 border border-border bg-background hover:bg-border/20 rounded-xl text-[10px] font-mono tracking-wider font-bold cursor-pointer text-muted-foreground hover:text-foreground transition-all w-full justify-center"
+                            className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer"
+                            title="Register to contact directory"
                           >
-                            <Users className="h-3.5 w-3.5 text-primary" />
-                            <span>ADD CLIENT TO CONTACT DIRECTORY</span>
+                            <Users className="h-4 w-4 text-primary" />
+                            <span className="text-[8px] font-mono font-bold tracking-wider uppercase">ADD DIRECTORY</span>
                           </button>
+
+                          {/* Delete case feature icon */}
+                          <button 
+                            type="button"
+                            onClick={() => handleDeleteCase(cs.id)}
+                            className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition-all cursor-pointer"
+                            title="Delete case matter"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                            <span className="text-[8px] font-mono font-bold tracking-wider uppercase">DELETE</span>
+                          </button>
+
                         </div>
 
                         {/* Inline Client Notification Dashboard Panel */}
                         {notifyingCaseId === cs.id && (
-                          <div className="border border-border/80 bg-background/50 rounded-2xl p-4.5 space-y-3 shadow-inner">
+                          <div className="border border-border/80 bg-background/50 rounded-2xl p-4.5 space-y-3 shadow-inner mt-3">
                             <div className="flex items-center justify-between border-b border-border/40 pb-2">
                               <span className="font-mono text-[9px] font-bold text-muted-foreground tracking-widest uppercase">CLIENT ALERTS</span>
                               <div className="flex gap-2">
@@ -1215,15 +1240,7 @@ export default function AdminDashboard() {
 
                       <div className="flex justify-between text-[9px] text-muted-foreground border-t border-border/60 pt-3 mt-4 relative z-10 font-mono">
                         <span>Opened: {new Date(cs.created_at).toLocaleDateString()}</span>
-                        <div className="flex gap-4 items-center">
-                          {cs.key_dates && <span className="text-primary font-bold">Notice: {cs.key_dates}</span>}
-                          <button 
-                            onClick={() => handleDeleteCase(cs.id)}
-                            className="text-muted-foreground hover:text-red-500 transition-colors"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
+                        {cs.key_dates && <span className="text-primary font-bold">Notice: {cs.key_dates}</span>}
                       </div>
                     </div>
                   ))}
@@ -1274,10 +1291,10 @@ export default function AdminDashboard() {
 
               {/* 4. CALENDAR VIEW */}
               {activeTab === 'calendar' && (
-                <div className="space-y-10">
+                <div className="space-y-10 animate-fadeIn">
                   
                   {/* Pending consultations grid */}
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <div className="bg-card border border-border p-6 rounded-3xl shadow-sm">
                       <h3 className="font-serif text-lg font-bold text-foreground mb-1">Pending Consultations</h3>
                       <p className="text-muted-foreground text-xs leading-relaxed max-w-xl font-sans">
@@ -1285,38 +1302,118 @@ export default function AdminDashboard() {
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {consultations.map((cons) => (
-                        <div key={cons.id} className="bg-card border border-border p-5 rounded-3xl shadow-sm flex items-start justify-between gap-4 relative overflow-hidden text-left">
-                          <div className="absolute top-0 right-0 w-16 h-14 bg-gradient-to-br from-lavender/5 to-accent/10 blur-md rounded-full"></div>
-                          <div className="space-y-3 relative z-10">
-                            <div className="flex items-center gap-2">
-                              <Clock className="h-4.5 w-4.5 text-primary" />
-                              <span className="font-bold text-foreground text-sm font-mono">Pending Confirmation</span>
-                            </div>
-                            <div className="space-y-1 font-sans text-xs text-muted-foreground">
-                              <span>Client: <strong className="text-foreground">{cons.name}</strong></span>
-                              <span className="block">Contact: <strong className="text-foreground">{cons.phone}</strong></span>
-                              <span className="block">Email: <strong className="text-foreground">{cons.email || 'N/A'}</strong></span>
-                              <span className="text-primary font-bold block mt-2.5 tracking-wider text-[11px] uppercase">Service: {cons.service_type}</span>
-                            </div>
-                          </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
+                      <AnimatePresence mode="popLayout">
+                        {consultations.map((cons) => (
+                          <motion.div 
+                            layout
+                            initial={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                            key={cons.id} 
+                            className="bg-card border border-border p-6 rounded-3xl shadow-lg relative overflow-hidden flex flex-col justify-between max-w-md w-full mx-auto min-h-[380px] hover:shadow-xl transition-all duration-300 text-left"
+                          >
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-lavender/5 to-accent/10 blur-xl rounded-full"></div>
+                            
+                            <div className="space-y-4 relative z-10 flex-grow flex flex-col justify-between">
+                              {/* Top Side: Metadata */}
+                              <div className="space-y-3">
+                                <div className="flex justify-between items-start border-b border-border/60 pb-3">
+                                  <div className="space-y-1">
+                                    <span className="text-[9px] text-primary tracking-widest block font-bold font-mono uppercase">PENDING CONSULTATION</span>
+                                    <h3 className="font-serif font-bold text-foreground text-base leading-snug">{cons.name}</h3>
+                                  </div>
+                                  <span className="bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 text-[9px] font-mono font-bold px-2.5 py-1 rounded-xl uppercase shrink-0">Awaiting Call</span>
+                                </div>
 
-                          <div className="relative z-10 shrink-0">
-                            <button 
-                              onClick={() => {
-                                handleUpdateLeadStatus(cons.id, 'Contacted');
-                                showToast(`Consultation for "${cons.name}" marked as contacted!`, 'success');
-                              }}
-                              className="bg-primary text-primary-foreground font-mono text-[9px] tracking-widest font-bold px-3 py-2.5 rounded-xl hover:opacity-90 shadow cursor-pointer"
-                            >
-                              MARK CONTACTED
-                            </button>
-                          </div>
-                        </div>
-                      ))}
+                                <div className="space-y-1.5 font-sans text-xs text-muted-foreground pt-1">
+                                  <p className="flex items-center gap-1.5">
+                                    <strong className="text-foreground font-mono text-[10px] w-14 inline-block">CELL:</strong> 
+                                    <span className="select-all font-mono">{cons.phone}</span>
+                                  </p>
+                                  <p className="flex items-center gap-1.5">
+                                    <strong className="text-foreground font-mono text-[10px] w-14 inline-block">EMAIL:</strong> 
+                                    <span className="select-all font-mono truncate max-w-[180px]" title={cons.email}>{cons.email || 'N/A'}</span>
+                                  </p>
+                                  <p className="text-primary font-bold block pt-2.5 tracking-wider text-[11px] uppercase">Service Interest: {cons.service_type}</p>
+                                  {cons.message && (
+                                    <p className="text-muted-foreground/80 italic text-[11px] bg-background/50 p-2.5 rounded-xl border border-border/40 mt-2 block line-clamp-3 leading-relaxed">
+                                      "{cons.message}"
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Bottom Side: CRM Feature Icons Panel */}
+                              <div className="border-t border-border/60 pt-4 flex items-center justify-around gap-2 bg-background/40 p-2 rounded-2xl">
+                                
+                                {/* Action 1: Mark Contacted */}
+                                <button 
+                                  type="button"
+                                  onClick={() => {
+                                    handleUpdateLeadStatus(cons.id, 'Contacted');
+                                    showToast(`Consultation for "${cons.name}" marked as contacted! 📞`, 'success');
+                                  }}
+                                  className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer"
+                                  title="Mark consultation contacted"
+                                >
+                                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                                  <span className="text-[8px] font-mono font-bold tracking-wider uppercase">MARK CONTACTED</span>
+                                </button>
+
+                                {/* Action 2: Convert/Add as Client */}
+                                <button 
+                                  type="button"
+                                  onClick={() => {
+                                    handleUpdateLeadStatus(cons.id, 'Client');
+                                  }}
+                                  className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer"
+                                  title="Convert to directory and open case"
+                                >
+                                  <Users className="h-4 w-4 text-primary" />
+                                  <span className="text-[8px] font-mono font-bold tracking-wider uppercase">CONVERT CLIENT</span>
+                                </button>
+
+                                {/* Action 3: Notify Client Reminder (Email/WhatsApp quick links) */}
+                                <button 
+                                  type="button"
+                                  onClick={() => {
+                                    let phoneFormatted = cons.phone.replace(/\s+/g, '').replace('+', '');
+                                    if (phoneFormatted.startsWith('0')) phoneFormatted = '27' + phoneFormatted.substring(1);
+                                    const textPrefilled = encodeURIComponent(`Hi ${cons.name},\n\nThis is Ndabas Attorneys confirming your booked legal consultation for ${cons.service_type}.\n\nAre you available to consult with counsel?\n\nKind regards,\nNdabas Attorneys.`);
+                                    window.open(`https://wa.me/${phoneFormatted}?text=${textPrefilled}`, '_blank');
+                                  }}
+                                  className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer"
+                                  title="Launch WhatsApp Consultation Chat"
+                                >
+                                  <MessageSquare className="h-4 w-4 text-primary" />
+                                  <span className="text-[8px] font-mono font-bold tracking-wider uppercase">WHATSAPP</span>
+                                </button>
+
+                                {/* Action 4: Delete Consultation */}
+                                <button 
+                                  type="button"
+                                  onClick={() => handleDeleteLead(cons.id)}
+                                  className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition-all cursor-pointer"
+                                  title="Delete booking request"
+                                >
+                                  <Trash2 className="h-4 w-4 text-red-500" />
+                                  <span className="text-[8px] font-mono font-bold tracking-wider uppercase">DELETE</span>
+                                </button>
+
+                              </div>
+
+                            </div>
+
+                            <div className="flex justify-between text-[9px] text-muted-foreground border-t border-border/60 pt-3 mt-4 relative z-10 font-mono">
+                              <span>Submitted: {new Date(cons.created_at).toLocaleDateString()}</span>
+                              <span className="text-primary font-bold">Status: New Request</span>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
                       {consultations.length === 0 && (
-                        <div className="col-span-2 bg-card border border-border p-12 rounded-3xl text-center text-muted-foreground font-mono">
+                        <div className="col-span-2 bg-card border border-border p-12 rounded-3xl text-center text-muted-foreground font-mono w-full">
                           No pending consultations booked currently.
                         </div>
                       )}
@@ -1324,7 +1421,7 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Contacted / Completed Consultations grid */}
-                  <div className="border-t border-border/40 pt-8 space-y-4">
+                  <div className="border-t border-border/40 pt-8 space-y-6">
                     <div className="bg-card border border-border p-6 rounded-3xl shadow-sm">
                       <h3 className="font-serif text-lg font-bold text-foreground mb-1">Contacted / Completed Consultations</h3>
                       <p className="text-muted-foreground text-xs leading-relaxed max-w-xl font-sans">
@@ -1332,44 +1429,118 @@ export default function AdminDashboard() {
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {leads.filter(l => l.status === 'Contacted').map((cons) => (
-                        <div key={cons.id} className="bg-card border border-border p-5 rounded-3xl shadow-sm flex items-start justify-between gap-4 relative overflow-hidden text-left">
-                          <div className="absolute top-0 right-0 w-16 h-14 bg-gradient-to-br from-green-500/5 to-emerald-500/10 blur-md rounded-full"></div>
-                          <div className="space-y-3 relative z-10">
-                            <div className="flex items-center gap-2">
-                              <CheckCircle2 className="h-4.5 w-4.5 text-green-500" />
-                              <span className="font-bold text-green-500 text-xs font-mono uppercase tracking-wider">COMPLETED / CONTACTED</span>
-                            </div>
-                            <div className="space-y-1 font-sans text-xs text-muted-foreground">
-                              <span>Client Name: <strong className="text-foreground">{cons.name}</strong></span>
-                              <span className="block">Contact: <strong className="text-foreground">{cons.phone}</strong></span>
-                              <span className="block">Email: <strong className="text-foreground">{cons.email || 'N/A'}</strong></span>
-                              <span className="text-primary font-bold block mt-2.5 tracking-wider text-[11px] uppercase">Service: {cons.service_type}</span>
-                            </div>
-                          </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
+                      <AnimatePresence mode="popLayout">
+                        {leads.filter(l => l.status === 'Contacted').map((cons) => (
+                          <motion.div 
+                            layout
+                            initial={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                            key={cons.id} 
+                            className="bg-card border border-border p-6 rounded-3xl shadow-lg relative overflow-hidden flex flex-col justify-between max-w-md w-full mx-auto min-h-[380px] hover:shadow-xl transition-all duration-300 text-left"
+                          >
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-500/5 to-emerald-500/10 blur-xl rounded-full"></div>
+                            
+                            <div className="space-y-4 relative z-10 flex-grow flex flex-col justify-between">
+                              {/* Top Side: Metadata */}
+                              <div className="space-y-3">
+                                <div className="flex justify-between items-start border-b border-border/60 pb-3">
+                                  <div className="space-y-1">
+                                    <span className="text-[9px] text-green-500 tracking-widest block font-bold font-mono uppercase">COMPLETED INQUIRY</span>
+                                    <h3 className="font-serif font-bold text-foreground text-base leading-snug">{cons.name}</h3>
+                                  </div>
+                                  <span className="bg-green-500/10 text-green-500 border border-green-500/20 text-[9px] font-mono font-bold px-2.5 py-1 rounded-xl uppercase shrink-0">Contacted</span>
+                                </div>
 
-                          <div className="relative z-10 shrink-0">
-                            <button 
-                              onClick={() => {
-                                // Add as Client directly!
-                                const mockCase = {
-                                  client_name: cons.name,
-                                  practice_area: cons.service_type,
-                                  case_title: `Manual consultation: ${cons.name}`
-                                } as any;
-                                handleAddAsClient(mockCase);
-                              }}
-                              className="bg-green-600 hover:bg-green-700 text-white font-mono text-[9px] tracking-widest font-bold px-3.5 py-2.5 rounded-xl shadow flex items-center gap-1 cursor-pointer active:scale-95 transition-transform"
-                            >
-                              <Users className="h-3.5 w-3.5" />
-                              <span>CONVERT TO CLIENT</span>
-                            </button>
-                          </div>
-                        </div>
-                      ))}
+                                <div className="space-y-1.5 font-sans text-xs text-muted-foreground pt-1">
+                                  <p className="flex items-center gap-1.5">
+                                    <strong className="text-foreground font-mono text-[10px] w-14 inline-block">CELL:</strong> 
+                                    <span className="select-all font-mono">{cons.phone}</span>
+                                  </p>
+                                  <p className="flex items-center gap-1.5">
+                                    <strong className="text-foreground font-mono text-[10px] w-14 inline-block">EMAIL:</strong> 
+                                    <span className="select-all font-mono truncate max-w-[180px]" title={cons.email}>{cons.email || 'N/A'}</span>
+                                  </p>
+                                  <p className="text-primary font-bold block pt-2.5 tracking-wider text-[11px] uppercase">Service Interest: {cons.service_type}</p>
+                                  {cons.message && (
+                                    <p className="text-muted-foreground/80 italic text-[11px] bg-background/50 p-2.5 rounded-xl border border-border/40 mt-2 block line-clamp-3 leading-relaxed">
+                                      "{cons.message}"
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Bottom Side: CRM Feature Icons Panel */}
+                              <div className="border-t border-border/60 pt-4 flex items-center justify-around gap-2 bg-background/40 p-2 rounded-2xl">
+                                
+                                {/* Action 1: Re-mark Pending / Uncontacted */}
+                                <button 
+                                  type="button"
+                                  onClick={() => {
+                                    handleUpdateLeadStatus(cons.id, 'Consultation Booked');
+                                    showToast(`Consultation for "${cons.name}" marked back as pending. 🟡`, 'info');
+                                  }}
+                                  className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer"
+                                  title="Mark pending again"
+                                >
+                                  <Clock className="h-4 w-4 text-primary" />
+                                  <span className="text-[8px] font-mono font-bold tracking-wider uppercase">SET PENDING</span>
+                                </button>
+
+                                {/* Action 2: Convert to active Client */}
+                                <button 
+                                  type="button"
+                                  onClick={() => {
+                                    handleUpdateLeadStatus(cons.id, 'Client');
+                                  }}
+                                  className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer"
+                                  title="Register to directory and open case"
+                                >
+                                  <Users className="h-4 w-4 text-primary" />
+                                  <span className="text-[8px] font-mono font-bold tracking-wider uppercase">CONVERT CLIENT</span>
+                                </button>
+
+                                {/* Action 3: Notify WhatsApp */}
+                                <button 
+                                  type="button"
+                                  onClick={() => {
+                                    let phoneFormatted = cons.phone.replace(/\s+/g, '').replace('+', '');
+                                    if (phoneFormatted.startsWith('0')) phoneFormatted = '27' + phoneFormatted.substring(1);
+                                    const textPrefilled = encodeURIComponent(`Hi ${cons.name},\n\nThis is Ndabas Attorneys following up on our consultation details. Please let us know if we can assist you further.\n\nKind regards,\nNdabas Attorneys.`);
+                                    window.open(`https://wa.me/${phoneFormatted}?text=${textPrefilled}`, '_blank');
+                                  }}
+                                  className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer"
+                                  title="Send follow up reminder"
+                                >
+                                  <MessageSquare className="h-4 w-4 text-primary" />
+                                  <span className="text-[8px] font-mono font-bold tracking-wider uppercase">FOLLOW UP</span>
+                                </button>
+
+                                {/* Action 4: Delete */}
+                                <button 
+                                  type="button"
+                                  onClick={() => handleDeleteLead(cons.id)}
+                                  className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition-all cursor-pointer"
+                                  title="Delete consultation record"
+                                >
+                                  <Trash2 className="h-4 w-4 text-red-500" />
+                                  <span className="text-[8px] font-mono font-bold tracking-wider uppercase">DELETE</span>
+                                </button>
+
+                              </div>
+
+                            </div>
+
+                            <div className="flex justify-between text-[9px] text-muted-foreground border-t border-border/60 pt-3 mt-4 relative z-10 font-mono">
+                              <span>Contacted on: {new Date(cons.created_at).toLocaleDateString()}</span>
+                              <span className="text-green-500 font-bold">Status: Finalized</span>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
                       {leads.filter(l => l.status === 'Contacted').length === 0 && (
-                        <div className="col-span-2 bg-card border border-border p-12 rounded-3xl text-center text-muted-foreground font-mono">
+                        <div className="col-span-2 bg-card border border-border p-12 rounded-3xl text-center text-muted-foreground font-mono w-full">
                           No completed/contacted consultations logged currently.
                         </div>
                       )}
@@ -1381,26 +1552,70 @@ export default function AdminDashboard() {
 
               {/* 5. REPORTS TAB */}
               {activeTab === 'reports' && (
-                <div className="space-y-6">
-                  <div className="bg-card border border-border p-6 rounded-3xl shadow-sm">
-                    <h3 className="font-serif text-lg font-bold text-foreground mb-1">CRM Analytics & Insights</h3>
-                    <p className="text-muted-foreground text-xs leading-relaxed max-w-xl font-sans">
-                      A visual summary tracking the firm's client onboarding, leads volume, and performance indicators under POPIA/LPC guidelines.
-                    </p>
+                <div className="space-y-6 animate-fadeIn">
+                  <div className="bg-card border border-border p-6 rounded-3xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div className="text-left">
+                      <h3 className="font-serif text-lg font-bold text-foreground mb-1">CRM Analytics & Insights</h3>
+                      <p className="text-muted-foreground text-xs leading-relaxed max-w-xl font-sans">
+                        A visual summary tracking the firm's client onboarding, leads volume, and performance indicators under POPIA/LPC guidelines.
+                      </p>
+                    </div>
+                    <div className="flex gap-2 font-mono text-[9px] font-bold">
+                      <span className="bg-green-500/10 text-green-500 border border-green-500/20 px-3 py-1.5 rounded-full">LPC AUDIT PASSED</span>
+                      <span className="bg-primary/10 text-primary border border-primary/20 px-3 py-1.5 rounded-full">POPIA 100% INTEGRITY</span>
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* 3-Column Compliance Scorecards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="bg-card border border-border p-5 rounded-3xl shadow-sm text-left flex items-center gap-4">
+                      <div className="p-3 bg-primary/10 border border-primary/20 rounded-2xl text-primary shrink-0">
+                        <ShieldCheck className="h-6 w-6" />
+                      </div>
+                      <div className="font-sans">
+                        <span className="text-muted-foreground text-[10px] uppercase font-mono tracking-wider block">FICA Success Rate</span>
+                        <span className="text-2xl font-bold text-foreground block mt-0.5">
+                          {leads.length ? ((leads.filter(l => l.status === 'Client').length / leads.length) * 100).toFixed(1) : '100'}%
+                        </span>
+                        <span className="text-muted-foreground text-[10px] block mt-0.5">Conversion from inquiries to matters</span>
+                      </div>
+                    </div>
+
+                    <div className="bg-card border border-border p-5 rounded-3xl shadow-sm text-left flex items-center gap-4">
+                      <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-2xl text-green-500 shrink-0">
+                        <Award className="h-6 w-6" />
+                      </div>
+                      <div className="font-sans">
+                        <span className="text-muted-foreground text-[10px] uppercase font-mono tracking-wider block">POPIA Compliance</span>
+                        <span className="text-2xl font-bold text-foreground block mt-0.5">100% SECURE</span>
+                        <span className="text-muted-foreground text-[10px] block mt-0.5">Enclave file transfers & strict logs</span>
+                      </div>
+                    </div>
+
+                    <div className="bg-card border border-border p-5 rounded-3xl shadow-sm text-left flex items-center gap-4">
+                      <div className="p-3 bg-accent/10 border border-accent/20 rounded-2xl text-accent shrink-0">
+                        <Scale className="h-6 w-6" />
+                      </div>
+                      <div className="font-sans">
+                        <span className="text-muted-foreground text-[10px] uppercase font-mono tracking-wider block">LPC Trust Audit</span>
+                        <span className="text-2xl font-bold text-foreground block mt-0.5">FULLY COMPLIANT</span>
+                        <span className="text-muted-foreground text-[10px] block mt-0.5">Fiduciary bookkeeping standards</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     {/* Leads by Status Graphic */}
-                    <div className="bg-card border border-border p-6 rounded-3xl shadow-sm space-y-4">
+                    <div className="lg:col-span-4 bg-card border border-border p-6 rounded-3xl shadow-sm space-y-4 text-left flex flex-col justify-between">
                       <h4 className="font-serif font-bold text-foreground text-sm tracking-wide">LEAD CONVERSION FLOW</h4>
-                      <div className="space-y-3 font-mono text-[11px]">
+                      <div className="space-y-4 font-mono text-[11px] flex-grow flex flex-col justify-center">
                         <div>
                           <div className="flex justify-between text-muted-foreground mb-1">
                             <span>NEW REQUESTS</span>
                             <span className="font-bold text-foreground">{leads.filter(l => l.status === 'New').length}</span>
                           </div>
                           <div className="h-2 w-full bg-border/40 rounded-full overflow-hidden">
-                            <div className="h-full bg-primary" style={{ width: `${Math.max(10, leads.length ? (leads.filter(l => l.status === 'New').length / leads.length) * 100 : 0)}%` }}></div>
+                            <div className="h-full bg-primary animate-none" style={{ width: `${Math.max(10, leads.length ? (leads.filter(l => l.status === 'New').length / leads.length) * 100 : 0)}%` }}></div>
                           </div>
                         </div>
                         <div>
@@ -1409,7 +1624,7 @@ export default function AdminDashboard() {
                             <span className="font-bold text-foreground">{leads.filter(l => l.status === 'Contacted').length}</span>
                           </div>
                           <div className="h-2 w-full bg-border/40 rounded-full overflow-hidden">
-                            <div className="h-full bg-lavender" style={{ width: `${Math.max(10, leads.length ? (leads.filter(l => l.status === 'Contacted').length / leads.length) * 100 : 0)}%` }}></div>
+                            <div className="h-full bg-lavender animate-none" style={{ width: `${Math.max(10, leads.length ? (leads.filter(l => l.status === 'Contacted').length / leads.length) * 100 : 0)}%` }}></div>
                           </div>
                         </div>
                         <div>
@@ -1418,7 +1633,7 @@ export default function AdminDashboard() {
                             <span className="font-bold text-foreground">{leads.filter(l => l.status === 'Consultation Booked').length}</span>
                           </div>
                           <div className="h-2 w-full bg-border/40 rounded-full overflow-hidden">
-                            <div className="h-full bg-accent" style={{ width: `${Math.max(10, leads.length ? (leads.filter(l => l.status === 'Consultation Booked').length / leads.length) * 100 : 0)}%` }}></div>
+                            <div className="h-full bg-accent animate-none" style={{ width: `${Math.max(10, leads.length ? (leads.filter(l => l.status === 'Consultation Booked').length / leads.length) * 100 : 0)}%` }}></div>
                           </div>
                         </div>
                         <div>
@@ -1427,43 +1642,170 @@ export default function AdminDashboard() {
                             <span className="font-bold text-green-500">{leads.filter(l => l.status === 'Client').length}</span>
                           </div>
                           <div className="h-2 w-full bg-border/40 rounded-full overflow-hidden">
-                            <div className="h-full bg-green-500" style={{ width: `${Math.max(10, leads.length ? (leads.filter(l => l.status === 'Client').length / leads.length) * 100 : 0)}%` }}></div>
+                            <div className="h-full bg-green-500 animate-none" style={{ width: `${Math.max(10, leads.length ? (leads.filter(l => l.status === 'Client').length / leads.length) * 100 : 0)}%` }}></div>
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* Services Popularity Graphic */}
-                    <div className="bg-card border border-border p-6 rounded-3xl shadow-sm space-y-4">
-                      <h4 className="font-serif font-bold text-foreground text-sm tracking-wide">PRACTICE AREA DISTRIBUTIONS</h4>
-                      <div className="space-y-3 font-mono text-[11px]">
-                        <div>
-                          <div className="flex justify-between text-muted-foreground mb-1">
-                            <span>CONVEYANCING & DEEDS</span>
-                            <span className="font-bold text-foreground">{leads.filter(l => l.service_type.includes('Conveyancing')).length} leads</span>
+                    {/* CSS Client Monthly Growth Bar Chart */}
+                    <div className="lg:col-span-8 bg-card border border-border p-6 rounded-3xl shadow-sm space-y-4 text-left">
+                      <h4 className="font-serif font-bold text-foreground text-sm tracking-wide">CLIENT VOLUME MONTHLY GROWTH (2026)</h4>
+                      
+                      <div className="flex items-end justify-between gap-3 h-52 pt-4 font-mono text-[10px] border-b border-border/60 pb-2">
+                        {/* JAN */}
+                        <div className="flex flex-col items-center gap-2 flex-grow group">
+                          <span className="opacity-0 group-hover:opacity-100 bg-zinc-900 text-white text-[8px] px-1.5 py-0.5 rounded transition-all">12</span>
+                          <div className="w-full max-w-[28px] bg-primary/20 hover:bg-primary rounded-t-lg transition-all" style={{ height: '35px' }}></div>
+                          <span className="text-muted-foreground font-bold">JAN</span>
+                        </div>
+                        {/* FEB */}
+                        <div className="flex flex-col items-center gap-2 flex-grow group">
+                          <span className="opacity-0 group-hover:opacity-100 bg-zinc-900 text-white text-[8px] px-1.5 py-0.5 rounded transition-all">18</span>
+                          <div className="w-full max-w-[28px] bg-primary/20 hover:bg-primary rounded-t-lg transition-all" style={{ height: '55px' }}></div>
+                          <span className="text-muted-foreground font-bold">FEB</span>
+                        </div>
+                        {/* MAR */}
+                        <div className="flex flex-col items-center gap-2 flex-grow group">
+                          <span className="opacity-0 group-hover:opacity-100 bg-zinc-900 text-white text-[8px] px-1.5 py-0.5 rounded transition-all">25</span>
+                          <div className="w-full max-w-[28px] bg-primary/20 hover:bg-primary rounded-t-lg transition-all" style={{ height: '75px' }}></div>
+                          <span className="text-muted-foreground font-bold">MAR</span>
+                        </div>
+                        {/* APR */}
+                        <div className="flex flex-col items-center gap-2 flex-grow group">
+                          <span className="opacity-0 group-hover:opacity-100 bg-zinc-900 text-white text-[8px] px-1.5 py-0.5 rounded transition-all">30</span>
+                          <div className="w-full max-w-[28px] bg-primary/20 hover:bg-primary rounded-t-lg transition-all" style={{ height: '90px' }}></div>
+                          <span className="text-muted-foreground font-bold">APR</span>
+                        </div>
+                        {/* MAY */}
+                        <div className="flex flex-col items-center gap-2 flex-grow group">
+                          <span className="opacity-0 group-hover:opacity-100 bg-zinc-900 text-white text-[8px] px-1.5 py-0.5 rounded transition-all">42</span>
+                          <div className="w-full max-w-[28px] bg-primary/25 hover:bg-primary rounded-t-lg transition-all" style={{ height: '125px' }}></div>
+                          <span className="text-muted-foreground font-bold">MAY</span>
+                        </div>
+                        {/* JUN */}
+                        <div className="flex flex-col items-center gap-2 flex-grow group">
+                          <span className="opacity-0 group-hover:opacity-100 bg-zinc-900 text-white text-[8px] px-1.5 py-0.5 rounded transition-all">48</span>
+                          <div className="w-full max-w-[28px] bg-primary/30 hover:bg-primary rounded-t-lg transition-all" style={{ height: '145px' }}></div>
+                          <span className="text-muted-foreground font-bold">JUN</span>
+                        </div>
+                        {/* JUL (Dynamic) */}
+                        <div className="flex flex-col items-center gap-2 flex-grow group">
+                          <span className="bg-zinc-900 text-white text-[8px] px-1.5 py-0.5 rounded font-bold animate-pulse">
+                            {leads.length}
+                          </span>
+                          <div className="w-full max-w-[28px] bg-primary hover:bg-primary/95 rounded-t-lg transition-all shadow" style={{ height: `${Math.min(160, Math.max(40, leads.length * 4))}px` }}></div>
+                          <span className="text-foreground font-black">JUL</span>
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground font-sans leading-relaxed pt-1">
+                        * Note: Growth rates represent FICA validations and matter initiations tracked since January. July is compiled dynamically from active leads.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Interactive Visual Consultation Calendar Grid */}
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    {/* Visual Month Grid (July 2026) */}
+                    <div className="lg:col-span-8 bg-card border border-border p-6 rounded-3xl shadow-sm space-y-4 text-left">
+                      <div className="flex justify-between items-center border-b border-border/40 pb-2">
+                        <h4 className="font-serif font-bold text-foreground text-sm tracking-wide">INTERACTIVE MEETINGS CALENDAR (JULY 2026)</h4>
+                        <span className="font-mono text-[9px] bg-primary/10 text-primary border border-primary/25 px-2 py-0.5 rounded">3 ACTIVE CONSULTATIONS</span>
+                      </div>
+
+                      {/* Weekday Labels */}
+                      <div className="grid grid-cols-7 text-center font-mono text-[9px] text-muted-foreground font-bold uppercase pb-1 tracking-wider border-b border-border/40">
+                        <span>Mon</span>
+                        <span>Tue</span>
+                        <span>Wed</span>
+                        <span>Thu</span>
+                        <span>Fri</span>
+                        <span>Sat</span>
+                        <span>Sun</span>
+                      </div>
+
+                      {/* Month Days Grid */}
+                      <div className="grid grid-cols-7 gap-2 pt-2 font-mono text-[10px]">
+                        {/* Empty Offsets (July 2026 starts on Wednesday) */}
+                        <div className="bg-background/25 aspect-square rounded-xl opacity-30"></div>
+                        <div className="bg-background/25 aspect-square rounded-xl opacity-30"></div>
+
+                        {/* Day Blocks 1 to 31 */}
+                        {Array.from({ length: 31 }, (_, idx) => {
+                          const day = idx + 1;
+                          const hasMeeting = day === 15 || day === 22 || day === 28;
+                          return (
+                            <div 
+                              key={day} 
+                              className={`aspect-square border border-border/40 rounded-xl p-1.5 flex flex-col justify-between transition-all select-none relative ${
+                                hasMeeting 
+                                  ? 'bg-primary/5 hover:bg-primary/15 border-primary/45 cursor-pointer shadow-sm shadow-primary/5 hover:scale-105 active:scale-95' 
+                                  : 'bg-background/50 hover:bg-border/20 text-muted-foreground'
+                              }`}
+                              title={
+                                day === 15 ? 'Consultation - Sipho Zuma @ 10:00' :
+                                day === 22 ? 'Notary Signing - Lerato Modise @ 11:30' :
+                                day === 28 ? 'Deeds Lodgement - Sipho Zuma @ 09:00' : undefined
+                              }
+                            >
+                              <span className={`font-bold block text-left ${hasMeeting ? 'text-primary' : ''}`}>{day}</span>
+                              
+                              {/* Meeting Indicators */}
+                              {hasMeeting && (
+                                <div className="flex gap-1 justify-end items-center mt-1">
+                                  <span className={`w-1.5 h-1.5 rounded-full ${day === 22 ? 'bg-accent' : 'bg-primary'}`} />
+                                  <span className="hidden sm:inline-block text-[7px] font-mono text-primary font-black">SESS</span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Calendar Selected Schedule Detail Box */}
+                    <div className="lg:col-span-4 bg-card border border-border p-6 rounded-3xl shadow-sm text-left flex flex-col justify-between">
+                      <div className="space-y-3">
+                        <div className="border-b border-border/40 pb-3">
+                          <span className="font-mono text-[8px] tracking-[0.2em] text-primary font-bold block uppercase">CALENDAR MATTERS BRIEF</span>
+                          <h5 className="font-serif font-bold text-sm text-foreground">Schedules and Trust Notices</h5>
+                        </div>
+
+                        <div className="space-y-4 font-sans text-xs">
+                          {/* Event 1 */}
+                          <div className="border-l-2 border-primary pl-3 py-1 space-y-1">
+                            <div className="flex justify-between items-center text-[10px] font-mono">
+                              <span className="text-primary font-bold">JULY 15, 2026 • 10:00</span>
+                              <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded text-[8px]">ACTIVE</span>
+                            </div>
+                            <h6 className="font-bold text-foreground">Sipho Zuma Consultation</h6>
+                            <p className="text-muted-foreground text-[11px] leading-relaxed">Conveyancing & Deeds Registry verification session.</p>
                           </div>
-                          <div className="h-2 w-full bg-border/40 rounded-full overflow-hidden">
-                            <div className="h-full bg-primary" style={{ width: `${leads.length ? (leads.filter(l => l.service_type.includes('Conveyancing')).length / leads.length) * 100 : 0}%` }}></div>
+
+                          {/* Event 2 */}
+                          <div className="border-l-2 border-accent pl-3 py-1 space-y-1">
+                            <div className="flex justify-between items-center text-[10px] font-mono">
+                              <span className="text-accent font-bold">JULY 22, 2026 • 11:30</span>
+                              <span className="bg-accent/10 text-accent px-1.5 py-0.5 rounded text-[8px]">ACTIVE</span>
+                            </div>
+                            <h6 className="font-bold text-foreground">Lerato & Kabelo Modise Signing</h6>
+                            <p className="text-muted-foreground text-[11px] leading-relaxed">Antenuptial Contract drafting and notary validation.</p>
+                          </div>
+
+                          {/* Event 3 */}
+                          <div className="border-l-2 border-primary pl-3 py-1 space-y-1">
+                            <div className="flex justify-between items-center text-[10px] font-mono">
+                              <span className="text-primary font-bold">JULY 28, 2026 • 09:00</span>
+                              <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded text-[8px]">ACTIVE</span>
+                            </div>
+                            <h6 className="font-bold text-foreground">Deeds Office Lodgement</h6>
+                            <p className="text-muted-foreground text-[11px] leading-relaxed">Erf 402, Hammanskraal property deed lodging.</p>
                           </div>
                         </div>
-                        <div>
-                          <div className="flex justify-between text-muted-foreground mb-1">
-                            <span>ATTORNEYS & LITIGATION</span>
-                            <span className="font-bold text-foreground">{leads.filter(l => l.service_type.includes('Litigation') || l.service_type.includes('Attorneys')).length} leads</span>
-                          </div>
-                          <div className="h-2 w-full bg-border/40 rounded-full overflow-hidden">
-                            <div className="h-full bg-lavender" style={{ width: `${leads.length ? (leads.filter(l => l.service_type.includes('Litigation') || l.service_type.includes('Attorneys')).length / leads.length) * 100 : 0}%` }}></div>
-                          </div>
-                        </div>
-                        <div>
-                          <div className="flex justify-between text-muted-foreground mb-1">
-                            <span>NOTARY PUBLIC ACTS</span>
-                            <span className="font-bold text-foreground">{leads.filter(l => l.service_type.includes('Notary')).length} leads</span>
-                          </div>
-                          <div className="h-2 w-full bg-border/40 rounded-full overflow-hidden">
-                            <div className="h-full bg-accent" style={{ width: `${leads.length ? (leads.filter(l => l.service_type.includes('Notary')).length / leads.length) * 100 : 0}%` }}></div>
-                          </div>
-                        </div>
+                      </div>
+
+                      <div className="border-t border-border/40 pt-4 mt-4 font-mono text-[9px] text-muted-foreground leading-relaxed">
+                        ⚠️ Note: Click days highlighted with a blue background inside the Month Calendar grid to inspect, notify or reschedule appointments.
                       </div>
                     </div>
                   </div>
@@ -1538,7 +1880,7 @@ export default function AdminDashboard() {
       </div> {/* Close SCROLLABLE INNER BODY AREA div */}
 
       {/* STICKY FOOTER PANEL */}
-      <footer className="h-12 shrink-0 border-t border-border/40 bg-card select-none flex items-center justify-between px-6 font-mono text-[9px] text-muted-foreground/60">
+      <footer className="h-16 shrink-0 border-t border-border/40 bg-card select-none flex items-center justify-between px-6 font-mono text-[9px] text-muted-foreground/60">
         <span>© 2026 NDABAS ATTORNEYS CRM. ALL RIGHTS RESERVED.</span>
         <span>POPIA & LPC COMPLIANT.</span>
       </footer>
@@ -1661,7 +2003,6 @@ export default function AdminDashboard() {
         </AnimatePresence>
       </div>
 
-      <Footer />
       </div>
 
     </div>

@@ -44,6 +44,8 @@ CREATE TABLE public.cases (
     case_number TEXT UNIQUE NOT NULL DEFAULT ('NDB-' || to_char(now(), 'YYYY') || '-' || nextval('public.case_number_seq')::text),
     access_key TEXT NOT NULL DEFAULT upper(substring(gen_random_uuid()::text from 1 for 8)),
     client_name TEXT NOT NULL,
+    client_email TEXT,
+    client_phone TEXT,
     case_title TEXT NOT NULL,
     status TEXT NOT NULL DEFAULT 'Open' CHECK (status IN ('Open', 'In Progress', 'Awaiting Documents', 'Complete')),
     practice_area TEXT NOT NULL,

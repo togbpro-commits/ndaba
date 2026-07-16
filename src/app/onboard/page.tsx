@@ -265,6 +265,8 @@ export default function Onboard() {
 
       const newCase = await db.insertCase({
         client_name: formData.name,
+        client_email: formData.email,
+        client_phone: formData.phone,
         case_title: `FICA ONBOARDING: ${formData.name} (${formData.matterType})`,
         status: 'Awaiting Documents',
         practice_area: formData.matterType.split(' ')[0],

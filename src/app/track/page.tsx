@@ -350,6 +350,8 @@ export default function Track() {
 
             const newCase = await db.insertCase({
               client_name: onboardData.name,
+              client_email: onboardData.email || 'onboarded@client.co.za',
+              client_phone: onboardData.phone,
               case_title: `FICA ONBOARDING (WA): ${onboardData.name} (${onboardData.matterType})`,
               status: 'Awaiting Documents',
               practice_area,

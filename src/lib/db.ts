@@ -25,6 +25,8 @@ export interface Case {
   case_number?: string;
   access_key?: string;
   client_name: string;
+  client_email?: string;
+  client_phone?: string;
   case_title: string;
   status: 'Open' | 'In Progress' | 'Awaiting Documents' | 'Complete';
   practice_area: string;
