@@ -77,7 +77,7 @@ export default function Navbar() {
             <a href="/contact" className="hover:text-foreground transition-colors">CONTACT</a>
           </div>
 
-          {/* Theme, Lock, & CTA (Hidden on mobile to avoid overlapping) */}
+          {/* Desktop Theme, Lock, & CTA (Hidden on mobile to avoid overlapping) */}
           <div className="hidden md:flex items-center gap-2.5">
             <button 
               onClick={toggleTheme}
@@ -103,26 +103,21 @@ export default function Navbar() {
             </a>
           </div>
 
-          {/* Minimal Mobile Logo Placeholder for structure */}
-          <div className="md:hidden flex items-center">
-            {/* Keeping spacing layout balanced */}
+          {/* Mobile Hamburger Toggle (Perfectly aligned on the right inside the nav bar container) */}
+          <div className="md:hidden flex items-center z-50">
+            <button 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              type="button"
+              className="h-9 w-9 bg-zinc-100 dark:bg-zinc-900 border border-border/80 rounded-full flex items-center justify-center text-zinc-950 dark:text-white cursor-pointer hover:scale-105 active:scale-95 transition-all focus:outline-none shadow-sm"
+              title="Toggle Navigation Menu"
+            >
+              {mobileMenuOpen ? <X className="h-4.5 w-4.5" /> : <Menu className="h-4.5 w-4.5" />}
+            </button>
           </div>
         </nav>
       </header>
 
-      {/* 2. FLOATING HAMBURGER TRIGGER BUTTON (High-contrast, mobile-first floating layout on the right) */}
-      <div className="md:hidden fixed top-6 right-6 z-50">
-        <button 
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          type="button"
-          className="h-11 w-11 bg-white dark:bg-zinc-900 border border-border/80 rounded-full shadow-xl flex items-center justify-center text-zinc-950 dark:text-white cursor-pointer hover:scale-105 active:scale-95 transition-all focus:outline-none"
-          title="Toggle Navigation Menu"
-        >
-          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-      </div>
-
-      {/* 3. SLIDING NAVIGATION DRAWER FROM THE RIGHT */}
+      {/* 2. SLIDING NAVIGATION DRAWER FROM THE RIGHT */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <>

@@ -102,7 +102,8 @@ export default function AdminDashboard() {
     docIndex: number;
   } | null>(null);
 
-  const [activeTab, setActiveTab] = useState<'leads' | 'cases' | 'clients' | 'calendar' | 'reports'>('leads');
+  const [activeTab, setActiveTab] = useState<'leads' | 'cases' | 'clients' | 'calendar' | 'reports'>('reports');
+  const [selectedCalendarDay, setSelectedCalendarDay] = useState<number>(15);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [cases, setCases] = useState<Case[]>([]);
   const [popiaLogs, setPopiaLogs] = useState<PopiaAuditLog[]>([]);
@@ -657,7 +658,23 @@ export default function AdminDashboard() {
 
           {/* Sidebar Tabs Links */}
           <nav className="flex flex-col gap-3 text-xs font-bold tracking-wider">
-            {/* 1. Leads Pipeline Tab */}
+            {/* 1. Reports Tab */}
+            <div className="relative group flex justify-center w-full">
+              <button
+                onClick={() => { setActiveTab('reports'); setSearchQuery(''); }}
+                className={`flex items-center gap-3 py-3 rounded-xl transition-all cursor-pointer ${isSidebarCollapsed ? 'justify-center px-0 w-12 mx-auto' : 'px-4 text-left w-full'} ${activeTab === 'reports' ? 'bg-primary/10 text-primary border border-primary/15 font-bold shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-border/20 border border-transparent'}`}
+              >
+                <TrendingUp className="h-4.5 w-4.5 shrink-0" />
+                {!isSidebarCollapsed && <span className="font-sans">ANALYTICS & POPIA</span>}
+              </button>
+              {isSidebarCollapsed && (
+                <div className="absolute left-16 top-1/2 -translate-y-1/2 bg-zinc-900 text-white font-mono text-[9px] tracking-widest font-bold px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none shadow-lg whitespace-nowrap z-50 border border-border/20">
+                  ANALYTICS & POPIA
+                </div>
+              )}
+            </div>
+
+            {/* 2. Leads Pipeline Tab */}
             <div className="relative group flex justify-center w-full">
               <button
                 onClick={() => { setActiveTab('leads'); setSearchQuery(''); }}
@@ -673,7 +690,7 @@ export default function AdminDashboard() {
               )}
             </div>
 
-            {/* 2. Case Tracker Tab */}
+            {/* 3. Case Tracker Tab */}
             <div className="relative group flex justify-center w-full">
               <button
                 onClick={() => { setActiveTab('cases'); setSearchQuery(''); }}
@@ -689,7 +706,7 @@ export default function AdminDashboard() {
               )}
             </div>
 
-            {/* 3. Client Directory Tab */}
+            {/* 4. Client Directory Tab */}
             <div className="relative group flex justify-center w-full">
               <button
                 onClick={() => { setActiveTab('clients'); setSearchQuery(''); }}
@@ -705,7 +722,7 @@ export default function AdminDashboard() {
               )}
             </div>
 
-            {/* 4. Meetings Calendar Tab */}
+            {/* 5. Meetings Calendar Tab */}
             <div className="relative group flex justify-center w-full">
               <button
                 onClick={() => { setActiveTab('calendar'); setSearchQuery(''); }}
@@ -728,22 +745,6 @@ export default function AdminDashboard() {
               {isSidebarCollapsed && (
                 <div className="absolute left-16 top-1/2 -translate-y-1/2 bg-zinc-900 text-white font-mono text-[9px] tracking-widest font-bold px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none shadow-lg whitespace-nowrap z-50 border border-border/20">
                   MEETINGS SCHEDULER
-                </div>
-              )}
-            </div>
-
-            {/* 5. Reports Tab */}
-            <div className="relative group flex justify-center w-full">
-              <button
-                onClick={() => { setActiveTab('reports'); setSearchQuery(''); }}
-                className={`flex items-center gap-3 py-3 rounded-xl transition-all cursor-pointer ${isSidebarCollapsed ? 'justify-center px-0 w-12 mx-auto' : 'px-4 text-left w-full'} ${activeTab === 'reports' ? 'bg-primary/10 text-primary border border-primary/15 font-bold shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-border/20 border border-transparent'}`}
-              >
-                <TrendingUp className="h-4.5 w-4.5 shrink-0" />
-                {!isSidebarCollapsed && <span className="font-sans">ANALYTICS & POPIA</span>}
-              </button>
-              {isSidebarCollapsed && (
-                <div className="absolute left-16 top-1/2 -translate-y-1/2 bg-zinc-900 text-white font-mono text-[9px] tracking-widest font-bold px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none shadow-lg whitespace-nowrap z-50 border border-border/20">
-                  ANALYTICS & POPIA
                 </div>
               )}
             </div>
@@ -777,10 +778,21 @@ export default function AdminDashboard() {
         
         {/* TOP STATUS / BREADCRUMB BAR */}
         <header className="bg-card border-b border-border/40 px-6 py-4 flex items-center justify-between select-none h-16 shrink-0 z-20">
-          <div className="flex items-center gap-2 text-xs font-mono font-bold">
-            <span className="text-muted-foreground">JUSTICE HOUSE</span>
-            <span className="text-muted-foreground/50">/</span>
-            <span className="text-primary tracking-wider uppercase">{activeTab === 'calendar' ? 'meetings scheduler' : activeTab === 'reports' ? 'compliance ledger' : `${activeTab} pipeline`}</span>
+          <div className="flex items-center gap-2">
+            {/* Desktop Brand breadcrumb (Hidden on mobile) */}
+            <div className="hidden md:flex items-center gap-2 text-xs font-mono font-bold">
+              <span className="text-muted-foreground">JUSTICE HOUSE</span>
+              <span className="text-muted-foreground/50">/</span>
+              <span className="text-primary tracking-wider uppercase">
+                {activeTab === 'calendar' ? 'meetings scheduler' : activeTab === 'reports' ? 'compliance ledger' : `${activeTab} pipeline`}
+              </span>
+            </div>
+
+            {/* Mobile Brand Logo (Visible on mobile, clickable link back to home '/') */}
+            <a href="/" className="md:hidden flex items-center gap-1.5 font-serif text-sm font-bold tracking-wide">
+              <Scale className="h-4.5 w-4.5 text-primary shrink-0" />
+              <span className="bg-gradient-to-r from-primary to-lavender bg-clip-text text-transparent uppercase tracking-wider font-sans font-extrabold text-[12px]">NDABAS CRM</span>
+            </a>
           </div>
           <div className="flex items-center gap-4 text-xs">
             <div className="hidden sm:flex items-center gap-2 font-mono text-[10px] text-muted-foreground">
@@ -1192,38 +1204,120 @@ export default function AdminDashboard() {
 
               {/* 3. CLIENT DIRECTORY */}
               {activeTab === 'clients' && (
-                <div className="bg-card border border-border rounded-3xl overflow-hidden shadow-sm">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-border/20 border-b border-border text-muted-foreground font-bold tracking-wider">
-                      <tr>
-                        <th className="p-4">CLIENT NAME</th>
-                        <th className="p-4">PHONE CHANNELS</th>
-                        <th className="p-4">EMAIL ADDRESS</th>
-                        <th className="p-4">DATE ONBOARDED</th>
-                        <th className="p-4 text-center">FICA STATUS</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border/60">
-                      {filteredClients.map((cl) => (
-                        <tr key={cl.id} className="hover:bg-border/10 transition-colors">
-                          <td className="p-4 font-bold text-foreground font-sans text-sm">{cl.name}</td>
-                          <td className="p-4 text-muted-foreground font-mono">{cl.phone}</td>
-                          <td className="p-4 text-muted-foreground font-mono">{cl.email || 'N/A'}</td>
-                          <td className="p-4 text-muted-foreground font-mono">{new Date(cl.created_at).toLocaleDateString()}</td>
-                          <td className="p-4 text-center">
-                            <span className="bg-green-500/10 text-green-500 border border-green-500/20 px-3 py-1 rounded-full text-[10px] font-bold tracking-wide">✓ VERIFIED FICA</span>
-                          </td>
-                        </tr>
-                      ))}
-                      {filteredClients.length === 0 && (
-                        <tr>
-                          <td colSpan={5} className="p-12 text-center text-muted-foreground font-mono">
-                            No onboarded client records found.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
+                  <AnimatePresence mode="popLayout">
+                    {filteredClients.map((cl) => {
+                      const initials = cl.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                      return (
+                        <motion.div 
+                          layout
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          key={cl.id} 
+                          className="bg-card border border-border p-6 rounded-3xl shadow-lg relative overflow-hidden flex flex-col justify-between max-w-sm w-full mx-auto min-h-[300px] hover:shadow-xl transition-all duration-300 text-left font-sans"
+                        >
+                          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-500/5 to-emerald-500/10 blur-xl rounded-full"></div>
+                          
+                          <div className="space-y-4 relative z-10 flex-grow flex flex-col justify-between">
+                            {/* Card Top: Initials Avatar & Name */}
+                            <div className="flex items-center gap-4 border-b border-border/60 pb-4">
+                              <div className="h-12 w-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-sm tracking-wide shrink-0">
+                                {initials}
+                              </div>
+                              <div className="truncate">
+                                <span className="font-mono text-[9px] tracking-widest text-primary font-bold block uppercase">VERIFIED CRM CONTACT</span>
+                                <h3 className="font-serif font-bold text-foreground text-base leading-snug truncate max-w-[180px]">{cl.name}</h3>
+                              </div>
+                            </div>
+
+                            {/* Card Middle: Info List */}
+                            <div className="space-y-2 text-xs text-muted-foreground pt-1 flex-grow">
+                              <p className="flex items-center gap-2">
+                                <strong className="text-foreground font-mono text-[10px] w-14 inline-block">CELL:</strong> 
+                                <span className="select-all font-mono text-foreground">{cl.phone}</span>
+                              </p>
+                              <p className="flex items-center gap-2">
+                                <strong className="text-foreground font-mono text-[10px] w-14 inline-block">EMAIL:</strong> 
+                                <span className="select-all font-mono text-foreground truncate max-w-[170px]" title={cl.email}>{cl.email || 'N/A'}</span>
+                              </p>
+                              <p className="flex items-center gap-2 pt-1.5">
+                                <strong className="text-foreground font-mono text-[10px] w-14 inline-block">ONBOARDED:</strong> 
+                                <span className="font-mono text-xs">{new Date(cl.created_at).toLocaleDateString()}</span>
+                              </p>
+                            </div>
+
+                            {/* Card Bottom: Quick Actions Bar (Email/WA click triggers!) */}
+                            <div className="border-t border-border/60 pt-4 flex items-center justify-around gap-2 bg-background/40 p-2 rounded-2xl">
+                              
+                              {/* Action 1: Send WhatsApp Follow up */}
+                              <button 
+                                type="button"
+                                onClick={() => {
+                                  let phoneFormatted = cl.phone.replace(/\s+/g, '').replace('+', '');
+                                  if (phoneFormatted.startsWith('0')) phoneFormatted = '27' + phoneFormatted.substring(1);
+                                  const textPrefilled = encodeURIComponent(`Hi ${cl.name},\n\nThis is Ndabas Attorneys following up on your legal matter files. Please let us know if we can assist you further.\n\nKind regards,\nNdabas Attorneys.`);
+                                  window.open(`https://wa.me/${phoneFormatted}?text=${textPrefilled}`, '_blank');
+                                }}
+                                className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer"
+                                title="Send WhatsApp Message"
+                              >
+                                <MessageSquare className="h-4 w-4 text-primary" />
+                                <span className="text-[8px] font-mono font-bold tracking-wider uppercase">WHATSAPP</span>
+                              </button>
+
+                              {/* Action 2: Open Direct Email */}
+                              <a 
+                                href={`mailto:${cl.email || 'info@ndabasattorneys.co.za'}`}
+                                className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer"
+                                title="Send Email Alert"
+                              >
+                                <Send className="h-4 w-4 text-primary" />
+                                <span className="text-[8px] font-mono font-bold tracking-wider uppercase">EMAIL</span>
+                              </a>
+
+                              {/* Action 3: View Associated Cases */}
+                              <button 
+                                type="button"
+                                onClick={() => {
+                                  setActiveTab('cases');
+                                  setSearchQuery(cl.name);
+                                }}
+                                className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer"
+                                title="Filter associated tracked cases"
+                              >
+                                <Briefcase className="h-4 w-4 text-primary" />
+                                <span className="text-[8px] font-mono font-bold tracking-wider uppercase">MATTERS</span>
+                              </button>
+
+                              {/* Action 4: Delete Client Record */}
+                              <button 
+                                type="button"
+                                onClick={() => handleDeleteLead(cl.id)}
+                                className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-red-500/10 text-muted-foreground hover:text-red-500 transition-all cursor-pointer"
+                                title="Delete client from database"
+                              >
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                                <span className="text-[8px] font-mono font-bold tracking-wider uppercase">DELETE</span>
+                              </button>
+
+                            </div>
+
+                          </div>
+
+                          <div className="flex justify-between text-[9px] text-muted-foreground border-t border-border/60 pt-3 mt-4 relative z-10 font-mono">
+                            <span>ID Ref: #{cl.id.substring(0, 8).toUpperCase()}</span>
+                            <span className="text-green-500 font-bold">✓ FICA VERIFIED</span>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
+                  {filteredClients.length === 0 && (
+                    <div className="col-span-2 bg-card border border-border p-12 rounded-3xl text-center text-muted-foreground font-mono w-full">
+                      No onboarded client records found.
+                    </div>
+                  )}
                 </div>
               )}
 
