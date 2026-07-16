@@ -768,11 +768,11 @@ export default function AdminDashboard() {
 
       </aside>
 
-      {/* RIGHT MAIN CONTENT AREA: Scrollable right side */}
-      <div className="flex-grow h-screen overflow-y-auto flex flex-col justify-between">
+      {/* RIGHT MAIN CONTENT AREA: Locked page height, scrollable inner content */}
+      <div className="flex-grow h-screen overflow-hidden flex flex-col justify-between bg-background">
         
         {/* TOP STATUS / BREADCRUMB BAR */}
-        <header className="bg-card border-b border-border/40 px-6 py-4 flex items-center justify-between select-none h-16 sticky top-0 z-20">
+        <header className="bg-card border-b border-border/40 px-6 py-4 flex items-center justify-between select-none h-16 shrink-0 z-20">
           <div className="flex items-center gap-2 text-xs font-mono font-bold">
             <span className="text-muted-foreground">JUSTICE HOUSE</span>
             <span className="text-muted-foreground/50">/</span>
@@ -784,8 +784,8 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        {/* MAIN BODY AREA */}
-        <main className="flex-grow p-6 sm:p-8 space-y-6 select-none max-w-6xl w-full mx-auto">
+        {/* SCROLLABLE INNER BODY AREA */}
+        <div className="flex-grow overflow-y-auto p-6 sm:p-8 space-y-6">
           
           {/* Header Snapshot Panel */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/40 pb-6">
@@ -1535,7 +1535,13 @@ export default function AdminDashboard() {
           )}
         </div>
 
-      </main>
+      </div> {/* Close SCROLLABLE INNER BODY AREA div */}
+
+      {/* STICKY FOOTER PANEL */}
+      <footer className="h-12 shrink-0 border-t border-border/40 bg-card select-none flex items-center justify-between px-6 font-mono text-[9px] text-muted-foreground/60">
+        <span>© 2026 NDABAS ATTORNEYS CRM. ALL RIGHTS RESERVED.</span>
+        <span>POPIA & LPC COMPLIANT.</span>
+      </footer>
 
       {/* Floating Document Previewer Modal */}
       <AnimatePresence>
