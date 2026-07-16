@@ -587,7 +587,7 @@ export default function AdminDashboard() {
               </div>
               
               <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed max-w-md font-sans">
-                Access authorized client profiles, litigation matters, notary deeds, and consultation bookings. Direct synchronization with the remote Pretoria Deeds Office and live Supabase pipelines.
+                Access authorized client profiles, litigation matters, notary deeds, and consultation bookings. Direct synchronization with the remote Pretoria Deeds Office and live secure cloud pipelines.
               </p>
 
               <div className="space-y-4 pt-2 max-w-md font-sans text-xs">
@@ -630,7 +630,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-background text-foreground transition-colors duration-500 overflow-hidden flex font-sans">
       
       {/* LEFT SIDEBAR: Collapsible sidebar-07 template styling */}
-      <aside className={`shrink-0 border-r border-border/60 bg-card select-none flex flex-col justify-between h-screen sticky top-0 transition-all duration-300 z-30 ${isSidebarCollapsed ? 'w-20' : 'w-64'}`}>
+      <aside className={`hidden md:flex shrink-0 border-r border-border/60 bg-card select-none flex flex-col justify-between h-screen sticky top-0 transition-all duration-300 z-30 ${isSidebarCollapsed ? 'w-20' : 'w-64'}`}>
         <div className={`flex flex-col gap-6 ${isSidebarCollapsed ? 'p-2' : 'p-4'}`}>
           {/* Brand Header */}
           <div className="flex items-center justify-between border-b border-border/40 pb-4 h-12">
@@ -795,7 +795,7 @@ export default function AdminDashboard() {
         </header>
 
         {/* SCROLLABLE INNER BODY AREA */}
-        <div className="flex-grow overflow-y-auto p-6 sm:p-8 space-y-6">
+        <div className="flex-grow overflow-y-auto p-6 sm:p-8 pb-24 md:pb-8 space-y-6">
           
           {/* Header Snapshot Panel */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/40 pb-6">
@@ -2003,10 +2003,56 @@ export default function AdminDashboard() {
       </AnimatePresence>
 
       {/* STICKY FOOTER PANEL */}
-      <footer className="h-16 shrink-0 border-t border-border/40 bg-card select-none flex items-center justify-between px-6 font-mono text-[9px] text-muted-foreground/60">
+      <footer className="hidden md:flex h-16 shrink-0 border-t border-border/40 bg-card select-none items-center justify-between px-6 font-mono text-[9px] text-muted-foreground/60 font-mono">
         <span>© 2026 NDABAS ATTORNEYS CRM. ALL RIGHTS RESERVED.</span>
         <span>POPIA & LPC COMPLIANT.</span>
       </footer>
+
+      {/* MOBILE BOTTOM NAVIGATION BAR */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-card border-t border-border/60 select-none flex items-center justify-around px-2 z-30 shadow-lg font-sans">
+        <button 
+          onClick={() => { setActiveTab('leads'); setSearchQuery(''); }}
+          className={`flex flex-col items-center justify-center gap-1 flex-grow h-full text-center transition-all cursor-pointer ${activeTab === 'leads' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          <Users className="h-5.5 w-5.5" />
+          <span className="text-[9px] font-bold font-sans uppercase tracking-wider">LEADS</span>
+        </button>
+
+        <button 
+          onClick={() => { setActiveTab('cases'); setSearchQuery(''); }}
+          className={`flex flex-col items-center justify-center gap-1 flex-grow h-full text-center transition-all cursor-pointer ${activeTab === 'cases' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          <Briefcase className="h-5.5 w-5.5" />
+          <span className="text-[9px] font-bold font-sans uppercase tracking-wider">MATTERS</span>
+        </button>
+
+        <button 
+          onClick={() => { setActiveTab('clients'); setSearchQuery(''); }}
+          className={`flex flex-col items-center justify-center gap-1 flex-grow h-full text-center transition-all cursor-pointer ${activeTab === 'clients' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          <Users className="h-5.5 w-5.5" />
+          <span className="text-[9px] font-bold font-sans uppercase tracking-wider">CONTACTS</span>
+        </button>
+
+        <button 
+          onClick={() => { setActiveTab('calendar'); setSearchQuery(''); }}
+          className={`flex flex-col items-center justify-center gap-1 flex-grow h-full text-center transition-all cursor-pointer relative ${activeTab === 'calendar' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          <Calendar className="h-5.5 w-5.5" />
+          <span className="text-[9px] font-bold font-sans uppercase tracking-wider">MEETINGS</span>
+          {consultations.length > 0 && (
+            <span className="absolute top-1.5 right-4 bg-primary text-primary-foreground font-mono text-[8px] h-3.5 w-3.5 rounded-full flex items-center justify-center font-bold shadow-sm">{consultations.length}</span>
+          )}
+        </button>
+
+        <button 
+          onClick={() => { setActiveTab('reports'); setSearchQuery(''); }}
+          className={`flex flex-col items-center justify-center gap-1 flex-grow h-full text-center transition-all cursor-pointer ${activeTab === 'reports' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          <TrendingUp className="h-5.5 w-5.5" />
+          <span className="text-[9px] font-bold font-sans uppercase tracking-wider">REPORTS</span>
+        </button>
+      </nav>
 
       {/* Floating Document Previewer Modal */}
       <AnimatePresence>

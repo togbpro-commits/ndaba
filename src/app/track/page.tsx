@@ -14,7 +14,9 @@ import {
   Sun,
   Moon,
   File,
-  Upload
+  Upload,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -83,6 +85,7 @@ export default function Track() {
   const [portalError, setPortalAccessError] = useState<string | null>(null);
   const [portalLoading, setPortalIsLoading] = useState(false);
   const [portalUploading, setPortalUploading] = useState(false);
+  const [showAccessKey, setShowAccessKey] = useState(false);
 
   const portalUploaderRef = useRef<HTMLInputElement>(null);
 
@@ -128,7 +131,7 @@ export default function Track() {
     const file = e.target.files[0];
     
     setPortalUploading(true);
-    showToast(`⏳ Uploading "${file.name}" to Supabase storage...`, 'info');
+    showToast(`⏳ Uploading "${file.name}" to secure cloud storage...`, 'info');
 
     try {
       const uploadedUrl = await db.uploadFile(file);
@@ -626,14 +629,24 @@ export default function Track() {
                     </div>
                     <div className="space-y-1 font-mono text-[10px] tracking-wider text-muted-foreground">
                       <label>SECRET ACCESS KEY</label>
-                      <input 
-                        type="text"
-                        value={portalAccessKey}
-                        onChange={(e) => setPortalAccessKey(e.target.value)}
-                        placeholder="8-CHARACTER ACCESS KEY"
-                        className="w-full bg-background border border-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-primary font-sans"
-                        required
-                      />
+                      <div className="relative w-full">
+                        <input 
+                          type={showAccessKey ? "text" : "password"}
+                          value={portalAccessKey}
+                          onChange={(e) => setPortalAccessKey(e.target.value)}
+                          placeholder="8-CHARACTER ACCESS KEY"
+                          className="w-full bg-background border border-border rounded-xl pl-4 pr-12 py-3 text-xs text-foreground focus:outline-none focus:border-primary font-sans"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowAccessKey(!showAccessKey)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 hover:bg-border/20 border border-border/40 rounded-xl text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+                          title={showAccessKey ? "Hide Access Key" : "Show Access Key"}
+                        >
+                          {showAccessKey ? <EyeOff className="h-4 w-4 text-primary" /> : <Eye className="h-4 w-4 text-primary" />}
+                        </button>
+                      </div>
                     </div>
                   </div>
 
