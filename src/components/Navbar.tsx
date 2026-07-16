@@ -55,6 +55,7 @@ export default function Navbar() {
           <a href="/about" className="hover:text-foreground transition-colors">ABOUT</a>
           <a href="/fees" className="hover:text-foreground transition-colors">FEES</a>
           <a href="/faq" className="hover:text-foreground transition-colors">FAQ</a>
+          <a href="/track" className="hover:text-primary transition-colors text-primary font-black">TRACK CASE</a>
           <a href="/contact" className="hover:text-foreground transition-colors">CONTACT</a>
         </div>
 
@@ -106,6 +107,7 @@ export default function Navbar() {
             <a href="/about" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:bg-border/20 rounded-xl">ABOUT</a>
             <a href="/fees" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:bg-border/20 rounded-xl">FEES</a>
             <a href="/faq" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:bg-border/20 rounded-xl">FAQ</a>
+            <a href="/track" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:bg-primary/20 rounded-xl font-bold text-primary">TRACK CASE</a>
             <a href="/contact" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:bg-border/20 rounded-xl">CONTACT</a>
             <a href="/admin" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:bg-border/20 rounded-xl font-bold text-accent">STAFF LOGIN</a>
             <a href="/onboard" onClick={() => setMobileMenuOpen(false)} className="bg-foreground text-background font-bold py-3 rounded-full mt-2">BOOK CONSULTATION</a>

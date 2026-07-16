@@ -107,6 +107,8 @@ export default function AdminDashboard() {
   const [cases, setCases] = useState<Case[]>([]);
   const [popiaLogs, setPopiaLogs] = useState<PopiaAuditLog[]>([]);
   const [uploadingCaseId, setUploadingCaseId] = useState<string | null>(null);
+  const [notifyingCase, setNotifyingCase] = useState<Case | null>(null);
+  const [notificationState, setNotificationState] = useState<'idle' | 'sending' | 'success'>('idle');
   const [notifyingCaseId, setNotifyingCaseId] = useState<string | null>(null);
   const [notificationSubject, setNotificationSubject] = useState('Case Status Update - Ndabas Attorneys');
   const [notificationMessage, setNotificationMessage] = useState('');
@@ -1130,7 +1132,7 @@ export default function AdminDashboard() {
                           <button 
                             type="button"
                             onClick={() => {
-                              setNotifyingCaseId(notifyingCaseId === cs.id ? null : cs.id);
+                              setNotifyingCase(cs);
                               
                               let prefilledMsg = `Hi ${cs.client_name},\n\nWe have received and verified your FICA uploads for case number ${cs.case_number || 'N/A'}.\n\nYour matter is now marked as ${cs.status.toUpperCase()}.\n\nKind regards,\nNdabas Attorneys.`;
                               if (cs.status === 'Awaiting Documents') {
@@ -1141,11 +1143,11 @@ export default function AdminDashboard() {
                               setNotificationMessage(prefilledMsg);
                               setNotificationSubject(`Legal Status Update - Case ${cs.case_number || 'N/A'}`);
                             }}
-                            className={`flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer ${notifyingCaseId === cs.id ? 'bg-primary/15 text-primary' : ''}`}
+                            className={`flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer ${notifyingCase?.id === cs.id ? 'bg-primary/15 text-primary' : ''}`}
                             title="Send status notification"
                           >
                             <MessageSquare className="h-4 w-4 text-primary" />
-                            <span className="text-[8px] font-mono font-bold tracking-wider uppercase">{notifyingCaseId === cs.id ? 'CLOSE' : 'NOTIFY'}</span>
+                            <span className="text-[8px] font-mono font-bold tracking-wider uppercase">{notifyingCase?.id === cs.id ? 'CLOSE' : 'NOTIFY'}</span>
                           </button>
 
                           {/* Add to Contact Directory feature icon */}
@@ -1171,70 +1173,6 @@ export default function AdminDashboard() {
                           </button>
 
                         </div>
-
-                        {/* Inline Client Notification Dashboard Panel */}
-                        {notifyingCaseId === cs.id && (
-                          <div className="border border-border/80 bg-background/50 rounded-2xl p-4.5 space-y-3 shadow-inner mt-3">
-                            <div className="flex items-center justify-between border-b border-border/40 pb-2">
-                              <span className="font-mono text-[9px] font-bold text-muted-foreground tracking-widest uppercase">CLIENT ALERTS</span>
-                              <div className="flex gap-2">
-                                <button 
-                                  type="button" 
-                                  onClick={() => setNotificationMethod('Email')} 
-                                  className={`px-2.5 py-1 rounded-lg text-[9px] font-mono font-bold transition-all ${notificationMethod === 'Email' ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground border border-border'}`}
-                                >
-                                  EMAIL
-                                </button>
-                                <button 
-                                  type="button" 
-                                  onClick={() => setNotificationMethod('WhatsApp')} 
-                                  className={`px-2.5 py-1 rounded-lg text-[9px] font-mono font-bold transition-all ${notificationMethod === 'WhatsApp' ? 'bg-green-600 text-white' : 'bg-card text-muted-foreground border border-border'}`}
-                                >
-                                  WHATSAPP
-                                </button>
-                              </div>
-                            </div>
-
-                            <div className="space-y-2 text-xs">
-                              {notificationMethod === 'Email' && (
-                                <div className="space-y-1 font-mono text-[9px] text-muted-foreground">
-                                  <label>SUBJECT</label>
-                                  <input 
-                                    type="text" 
-                                    value={notificationSubject}
-                                    onChange={(e) => setNotificationSubject(e.target.value)}
-                                    className="w-full bg-background border border-border rounded-xl px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary font-sans" 
-                                  />
-                                </div>
-                              )}
-                              <div className="space-y-1 font-mono text-[9px] text-muted-foreground">
-                                <label>MESSAGE STATEMENT</label>
-                                <textarea 
-                                  value={notificationMessage}
-                                  onChange={(e) => setNotificationMessage(e.target.value)}
-                                  rows={4}
-                                  className="w-full bg-background border border-border rounded-xl p-3 text-xs text-foreground focus:outline-none focus:border-primary font-sans resize-none" 
-                                />
-                              </div>
-
-                              <button
-                                type="button"
-                                disabled={isSendingNotification}
-                                onClick={() => handleSendClientNotification(cs)}
-                                className={`w-full py-2.5 rounded-xl font-mono text-[9px] tracking-wider font-bold uppercase flex items-center justify-center gap-1.5 cursor-pointer shadow-sm transition-all ${notificationMethod === 'Email' ? 'bg-foreground text-background dark:bg-foreground dark:text-background' : 'bg-green-600 text-white'}`}
-                              >
-                                {isSendingNotification ? (
-                                  <span>TRANSMITTING...</span>
-                                ) : (
-                                  <>
-                                    <Send className="h-3 w-3" />
-                                    <span>{notificationMethod === 'Email' ? 'Send Compliance Email' : 'Launch WhatsApp Chat'}</span>
-                                  </>
-                                )}
-                              </button>
-                            </div>
-                          </div>
-                        )}
 
                       </div>
 
@@ -1878,6 +1816,191 @@ export default function AdminDashboard() {
         </div>
 
       </div> {/* Close SCROLLABLE INNER BODY AREA div */}
+
+      {/* Shadcn-Style Floating Notification Dialog Modal */}
+      <AnimatePresence>
+        {notifyingCase && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 font-sans select-none">
+            {/* Click outside to close (disabled when loading) */}
+            <div 
+              className="absolute inset-0 cursor-default animate-none" 
+              onClick={() => {
+                if (notificationState !== 'sending' && notificationState !== 'success') {
+                  setNotifyingCase(null);
+                  setNotificationState('idle');
+                }
+              }}
+            />
+            
+            {/* Shadcn Card Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-lg bg-card border border-border rounded-3xl shadow-2xl overflow-hidden flex flex-col z-10 p-6 text-left"
+            >
+              {/* Close Button */}
+              {notificationState !== 'sending' && (
+                <button 
+                  onClick={() => {
+                    setNotifyingCase(null);
+                    setNotificationState('idle');
+                  }}
+                  className="absolute top-4 right-4 p-2 hover:bg-border/20 border border-border rounded-xl text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+                  title="Close modal"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+
+              {notificationState === 'success' ? (
+                // Success State View
+                <div className="py-8 flex flex-col items-center text-center space-y-4 animate-scaleUp">
+                  <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-full text-green-500">
+                    <CheckCircle2 className="h-10 w-10 animate-bounce" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="font-serif font-bold text-xl text-foreground">Client Notified Successfully!</h4>
+                    <p className="text-muted-foreground text-xs leading-relaxed max-w-sm">
+                      Your compliance alert has been transmitted successfully to <strong className="text-foreground">{notifyingCase.client_email || 'onboarded@client.co.za'}</strong> via Email.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNotifyingCase(null);
+                      setNotificationState('idle');
+                    }}
+                    className="px-6 py-2.5 bg-foreground text-background dark:bg-foreground dark:text-background font-mono text-[10px] tracking-widest font-bold rounded-xl cursor-pointer shadow hover:opacity-90 transition-all"
+                  >
+                    DISMISS DETAILS
+                  </button>
+                </div>
+              ) : (
+                // Input Form State
+                <div className="space-y-4">
+                  <div className="border-b border-border/60 pb-3">
+                    <span className="font-mono text-[9px] tracking-widest text-primary font-bold block uppercase">SECURE TRANSMISSION CENTER</span>
+                    <h3 className="font-serif font-bold text-xl text-foreground mt-0.5">Send Client Compliance Alert</h3>
+                    <p className="text-muted-foreground text-[10px] leading-relaxed mt-1">
+                      Deliver urgent FICA statuses, approval logs, or progress announcements for Case Ref: <strong className="text-foreground">{notifyingCase.case_number || 'N/A'}</strong>.
+                    </p>
+                  </div>
+
+                  {/* Channel Tab Selector */}
+                  <div className="flex gap-2 bg-background/50 border border-border p-1 rounded-2xl">
+                    <button 
+                      type="button" 
+                      onClick={() => setNotificationMethod('Email')} 
+                      className={`flex-grow py-2 rounded-xl text-[10px] font-mono font-bold tracking-wider transition-all cursor-pointer ${notificationMethod === 'Email' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                      EMAIL ALERT
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => setNotificationMethod('WhatsApp')} 
+                      className={`flex-grow py-2 rounded-xl text-[10px] font-mono font-bold tracking-wider transition-all cursor-pointer ${notificationMethod === 'WhatsApp' ? 'bg-green-600 text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                      WHATSAPP BOT ALERT
+                    </button>
+                  </div>
+
+                  {/* Fields */}
+                  <div className="space-y-3">
+                    <div className="font-sans text-xs text-muted-foreground space-y-1">
+                      <p><strong className="text-foreground font-mono text-[10px] inline-block w-20">RECIPIENT:</strong> {notifyingCase.client_name}</p>
+                      <p><strong className="text-foreground font-mono text-[10px] inline-block w-20">CONTACT:</strong> {notificationMethod === 'Email' ? (notifyingCase.client_email || 'onboarded@client.co.za') : (notifyingCase.client_phone || '082 490 6285')}</p>
+                    </div>
+
+                    {notificationMethod === 'Email' && (
+                      <div className="space-y-1 font-mono text-[9px] text-muted-foreground">
+                        <label>EMAIL SUBJECT</label>
+                        <input 
+                          type="text" 
+                          value={notificationSubject}
+                          onChange={(e) => setNotificationSubject(e.target.value)}
+                          className="w-full bg-background border border-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-primary font-sans" 
+                        />
+                      </div>
+                    )}
+
+                    <div className="space-y-1 font-mono text-[9px] text-muted-foreground">
+                      <label>MESSAGE STATEMENT</label>
+                      <textarea 
+                        value={notificationMessage}
+                        onChange={(e) => setNotificationMessage(e.target.value)}
+                        rows={5}
+                        className="w-full bg-background border border-border rounded-xl p-4 text-xs text-foreground focus:outline-none focus:border-primary font-sans resize-none leading-relaxed" 
+                      />
+                    </div>
+                  </div>
+
+                  {/* Transmit Trigger */}
+                  <button
+                    type="button"
+                    disabled={notificationState === 'sending'}
+                    onClick={async () => {
+                      setNotificationState('sending');
+                      try {
+                        const clientEmail = notifyingCase.client_email || 'onboarded@client.co.za';
+                        const clientPhone = notifyingCase.client_phone || '082 490 6285';
+
+                        if (notificationMethod === 'Email') {
+                          const res = await sendClientNotificationEmail({
+                            name: notifyingCase.client_name,
+                            email: clientEmail,
+                            subject: notificationSubject,
+                            message: notificationMessage,
+                            caseNumber: notifyingCase.case_number || notifyingCase.id
+                          });
+                          if (res.success) {
+                            setNotificationState('success');
+                            showToast(`Client notified successfully via Email! ✉️`, 'success');
+                          } else {
+                            throw new Error(res.error);
+                          }
+                        } else {
+                          // WhatsApp Click-to-Chat
+                          let formattedPhone = clientPhone.replace(/\s+/g, '').replace('+', '');
+                          if (formattedPhone.startsWith('0')) {
+                            formattedPhone = '27' + formattedPhone.substring(1);
+                          }
+                          const prefilledText = encodeURIComponent(`*${notificationSubject}*\n\nDear ${notifyingCase.client_name},\n\n${notificationMessage}\n\n_Ref Case Number: ${notifyingCase.case_number || 'N/A'}_`);
+                          const whatsappUrl = `https://wa.me/${formattedPhone}?text=${prefilledText}`;
+                          
+                          window.open(whatsappUrl, '_blank');
+                          showToast('WhatsApp Chat window launched! 💬', 'success');
+                          setNotifyingCase(null);
+                          setNotificationState('idle');
+                        }
+                      } catch (err: any) {
+                        console.error('Error sending client notification:', err);
+                        showToast(`Failed to send notification: ${err.message || String(err)}`, 'error');
+                        setNotificationState('idle');
+                      }
+                    }}
+                    className={`w-full py-3.5 rounded-xl font-mono text-[9px] tracking-widest font-bold uppercase flex items-center justify-center gap-2 cursor-pointer shadow transition-all ${
+                      notificationState === 'sending' ? 'opacity-70 cursor-not-allowed' : ''
+                    } ${notificationMethod === 'Email' ? 'bg-foreground text-background dark:bg-foreground dark:text-background animate-none' : 'bg-green-600 text-white hover:bg-green-700 animate-none'}`}
+                  >
+                    {notificationState === 'sending' ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                        <span>TRANSMITTING ALERT...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <Send className="h-3.5 w-3.5" />
+                        <span>{notificationMethod === 'Email' ? 'Transmit Compliance Email' : 'Transmit WhatsApp Chat'}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* STICKY FOOTER PANEL */}
       <footer className="h-16 shrink-0 border-t border-border/40 bg-card select-none flex items-center justify-between px-6 font-mono text-[9px] text-muted-foreground/60">
