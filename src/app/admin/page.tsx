@@ -1113,7 +1113,7 @@ export default function AdminDashboard() {
                           </span>
                           
                           {cs.documents && cs.documents.length > 0 ? (
-                            <div className="grid grid-cols-1 gap-2 pt-1 max-h-[160px] overflow-y-auto pr-1 scrollbar-thin">
+                            <div className="grid grid-cols-1 gap-2 pt-1 max-h-[160px] overflow-y-auto pr-1 custom-card-scrollbar">
                               {cs.documents.map((doc, dIdx) => (
                                 <div key={dIdx} className="bg-background border border-border rounded-xl p-2.5 flex items-center justify-between gap-3 shadow-xs font-sans text-left">
                                   {/* Left: Icon and Details */}

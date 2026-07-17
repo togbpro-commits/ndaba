@@ -83,3 +83,21 @@ h1, h2, h3, h4, h5, h6, .font-serif {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary);
 }
+
+/* Premium ultra-thin custom scrollbar for dashboard cards */
+.custom-card-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.custom-card-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-card-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  opacity: 0.25;
+  border-radius: 8px;
+}
+.custom-card-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+  opacity: 0.6;
+}
