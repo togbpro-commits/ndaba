@@ -74,7 +74,7 @@ export default function Onboard() {
     address: '',
     
     // Step 2: Matter Details
-    matterType: 'Conveyancing & Property Transfers',
+    matterType: 'General Legal Inquiry / Other',
     matterDescription: '',
     
     // Step 3: Booking Info
@@ -85,6 +85,27 @@ export default function Onboard() {
     popiaConsent: false,
     signatureName: ''
   });
+
+  // Load URL query parameters on mount to pre-select matter checklists (Hydration-safe)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search);
+      const matterParam = searchParams.get('matter');
+      
+      if (matterParam === 'conveyancing') {
+        setFormData(prev => ({ ...prev, matterType: 'Conveyancing & Property Transfers' }));
+      } else if (matterParam === 'notary') {
+        setFormData(prev => ({ ...prev, matterType: 'Notary Services (Antenuptial Contracts)' }));
+      } else if (matterParam === 'litigation') {
+        setFormData(prev => ({ ...prev, matterType: 'Attorneys & Litigation' }));
+      } else if (matterParam === 'advocacy') {
+        setFormData(prev => ({ ...prev, matterType: 'Advocacy Counsel' }));
+      } else {
+        // Default to General Onboarding if no parameters or 'general' is found
+        setFormData(prev => ({ ...prev, matterType: 'General Legal Inquiry / Other' }));
+      }
+    }
+  }, []);
 
   // Step 3: Mock Files Upload state
   const [uploadedFiles, setUploadedFiles] = useState<{ name: string; size: string; progress: number; url?: string | null; requirementName?: string }[]>([]);
@@ -588,8 +609,9 @@ export default function Onboard() {
                       <select 
                         value={formData.matterType}
                         onChange={(e) => setFormData({ ...formData, matterType: e.target.value })}
-                        className="w-full bg-background border border-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-primary font-sans"
+                        className="w-full bg-background border border-border rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none focus:border-primary font-sans cursor-pointer h-12"
                       >
+                        <option>General Legal Inquiry / Other</option>
                         <option>Conveyancing & Property Transfers</option>
                         <option>Notary Services (Antenuptial Contracts)</option>
                         <option>Attorneys & Litigation</option>

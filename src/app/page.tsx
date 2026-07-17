@@ -618,8 +618,12 @@ export default function Home() {
                 </p>
                 <div className="pt-2">
                   <a 
-                    href="/onboard" 
-                    className="inline-flex bg-foreground text-background dark:bg-foreground dark:text-background font-mono text-[10px] tracking-widest font-bold px-6 py-3 rounded-full hover:opacity-95 shadow-sm transition-all"
+                    href={
+                      activePrecheck === 'property' ? '/onboard?matter=conveyancing' :
+                      activePrecheck === 'marriage' ? '/onboard?matter=notary' :
+                      '/onboard?matter=litigation'
+                    } 
+                    className="inline-flex bg-foreground text-background dark:bg-foreground dark:text-background font-mono text-[10px] tracking-widest font-bold px-6 py-3 rounded-full hover:opacity-95 shadow-sm transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
                   >
                     ONBOARD WITH THESE FILES →
                   </a>
