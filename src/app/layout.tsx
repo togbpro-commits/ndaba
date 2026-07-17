@@ -8,11 +8,13 @@ import { Analytics } from "@vercel/analytics/next";
 const playfair = Playfair_Display({
   variable: "--font-serif",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 // Production-grade SEO Metadata Config for South African Legal Search Engines

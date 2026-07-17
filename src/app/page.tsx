@@ -288,8 +288,9 @@ export default function Home() {
           className="w-full border border-border/80 bg-card rounded-3xl overflow-hidden shadow-sm h-[200px] sm:h-[350px] relative mb-16 selection:pointer-events-none"
         >
           <img 
-            src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1000&auto=format&fit=crop" 
+            src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=60&w=800&auto=format&fit=crop" 
             alt="Justice House Chambers Pretoria"
+            fetchPriority="high"
             className="w-full h-full object-cover opacity-85 dark:opacity-40 hover:scale-[1.01] transition-transform duration-700 select-none pointer-events-none"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
