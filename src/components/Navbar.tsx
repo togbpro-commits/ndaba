@@ -11,15 +11,33 @@ export default function Navbar() {
   // Lock background body scroll when mobile drawer is open to prevent mobile overscroll
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      const html = window.document.documentElement;
+      const body = window.document.body;
+
       if (mobileMenuOpen) {
-        window.document.body.style.overflow = 'hidden';
+        html.style.overflow = 'hidden';
+        html.style.height = '100%';
+        body.style.overflow = 'hidden';
+        body.style.height = '100%';
+        // Prevent touch dragging on mobile background
+        body.style.touchAction = 'none';
       } else {
-        window.document.body.style.overflow = '';
+        html.style.overflow = '';
+        html.style.height = '';
+        body.style.overflow = '';
+        body.style.height = '';
+        body.style.touchAction = '';
       }
     }
     return () => {
       if (typeof window !== 'undefined') {
-        window.document.body.style.overflow = '';
+        const html = window.document.documentElement;
+        const body = window.document.body;
+        html.style.overflow = '';
+        html.style.height = '';
+        body.style.overflow = '';
+        body.style.height = '';
+        body.style.touchAction = '';
       }
     };
   }, [mobileMenuOpen]);
@@ -136,7 +154,7 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 210 }}
-              className="md:hidden fixed inset-y-0 right-0 z-40 w-72 h-full bg-white dark:bg-zinc-950 border-l border-border shadow-2xl flex flex-col justify-between p-6 pt-24 font-mono text-xs select-none"
+              className="md:hidden fixed inset-y-0 right-0 z-40 w-72 h-[100dvh] bg-white dark:bg-zinc-950 border-l border-border shadow-2xl flex flex-col justify-between p-6 pt-24 font-mono text-xs select-none"
             >
               {/* Drawer Links Stack */}
               <div className="flex flex-col gap-4 text-center tracking-widest text-muted-foreground font-bold">
