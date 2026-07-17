@@ -402,7 +402,7 @@ export default function Onboard() {
             <div className="space-y-3">
               <h2 className="font-serif text-2xl font-bold text-foreground">Onboarding Complete</h2>
               <p className="text-muted-foreground text-xs sm:text-sm max-w-md mx-auto leading-relaxed">
-                Thank you, <strong className="text-foreground">{formData.name}</strong>. Your legal FICA file and mock case matter have been successfully generated in the Ndabas Attorneys CRM system.
+                Thank you, <strong className="text-foreground">{formData.name}</strong>. Your legal FICA file and active case matter have been successfully generated in the Ndabas Attorneys CRM system.
               </p>
             </div>
 
@@ -621,13 +621,13 @@ export default function Onboard() {
                     className="space-y-6"
                   >
                     <div className="space-y-1.5 border-b border-border/60 pb-3">
-                      <h3 className="font-serif text-xl font-normal text-foreground">FICA Checklist & Mock File Upload</h3>
-                      <p className="text-muted-foreground text-xs leading-relaxed">Prepare the necessary legal documentation according to your matter type.</p>
+                      <h3 className="font-serif text-xl font-normal text-foreground">Secure FICA Document Verification</h3>
+                      <p className="text-muted-foreground text-xs leading-relaxed">Prepare and upload the necessary legal documentation according to your matter type.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                       
-                      {/* Left: Dynamic Checklist Display with Inline Uploaders */}
+                      {/* Left: Dynamic Checklist Display with Inline Uploaders (Stable Heights) */}
                       <div className="space-y-4">
                         <span className="font-mono text-[9px] tracking-widest text-primary font-bold block uppercase bg-primary/10 px-2.5 py-1 rounded w-fit">REQUIRED AT JUSTICE HOUSE</span>
                         <div className="space-y-3">
@@ -636,34 +636,36 @@ export default function Onboard() {
                             const matchingFile = uploadedFiles.find(f => f.requirementName === guide.label);
 
                             return (
-                              <div key={idx} className="bg-background border border-border/60 p-4 rounded-xl shadow-sm space-y-3">
-                                <div className="flex gap-2.5 items-start">
-                                  <CheckCircle2 className={`h-4.5 w-4.5 shrink-0 mt-0.5 ${matchingFile?.progress === 100 ? 'text-green-500' : 'text-primary'}`} />
-                                  <div className="space-y-0.5 font-sans">
+                              <div key={idx} className="bg-card border border-border/65 p-4 rounded-2xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 min-h-[96px] sm:min-h-[80px] transition-all hover:border-primary/10 relative overflow-hidden select-none">
+                                <div className="flex gap-3 items-start max-w-full sm:max-w-[55%]">
+                                  <CheckCircle2 className={`h-5 w-5 shrink-0 mt-0.5 ${matchingFile?.progress === 100 ? 'text-green-500' : 'text-primary'}`} />
+                                  <div className="space-y-1 text-left font-sans">
                                     <span className="font-bold text-foreground text-xs block">{guide.label}</span>
-                                    <span className="text-muted-foreground text-[11px] leading-relaxed block">{guide.desc}</span>
+                                    <span className="text-muted-foreground text-[10.5px] leading-relaxed block line-clamp-2 sm:line-clamp-1" title={guide.desc}>{guide.desc}</span>
                                   </div>
                                 </div>
 
-                                {/* Inline uploader status or action */}
-                                <div className="pl-7">
+                                {/* Right Side: Compact, stable-height uploader or file info */}
+                                <div className="shrink-0 w-full sm:w-[220px] h-10 flex items-center justify-end">
                                   {matchingFile ? (
-                                    <div className="bg-card border border-border/50 rounded-xl p-2.5 flex items-center justify-between gap-3 text-[11px] shadow-sm animate-fade-in">
-                                      <div className="flex items-center gap-2 truncate max-w-[65%]">
-                                        <File className="h-3.5 w-3.5 text-primary shrink-0" />
+                                    <div className="bg-background border border-border rounded-xl px-2.5 py-1.5 w-full h-full flex items-center justify-between gap-3 text-[10px] shadow-xs relative animate-fade-in">
+                                      <div className="flex items-center gap-2 truncate max-w-[70%]">
+                                        <File className="h-3.5 w-3.5 text-primary shrink-0 animate-pulse" />
                                         <div className="truncate space-y-0.5">
-                                          <span className="font-bold text-foreground block truncate">{matchingFile.name}</span>
-                                          <span className="text-[9px] text-muted-foreground block">{matchingFile.size} · {matchingFile.progress === 100 ? 'Uploaded ✅' : `${matchingFile.progress}%`}</span>
+                                          <span className="font-bold text-foreground block truncate" title={matchingFile.name}>{matchingFile.name}</span>
+                                          <span className="text-[9px] text-muted-foreground block font-mono">{matchingFile.size} · {matchingFile.progress === 100 ? 'Uploaded ✅' : `${matchingFile.progress}%`}</span>
                                         </div>
                                       </div>
-                                      <div className="flex items-center gap-2 shrink-0 font-mono">
-                                        <div className="h-1 w-10 bg-border rounded-full overflow-hidden">
-                                          <div className={`h-full ${matchingFile.progress === 100 ? 'bg-green-500' : 'bg-primary'}`} style={{ width: `${matchingFile.progress}%` }}></div>
-                                        </div>
+                                      <div className="flex items-center gap-2 shrink-0">
+                                        {matchingFile.progress < 100 && (
+                                          <div className="h-1 w-8 bg-border rounded-full overflow-hidden">
+                                            <div className="h-full bg-primary" style={{ width: `${matchingFile.progress}%` }}></div>
+                                          </div>
+                                        )}
                                         <button 
                                           type="button"
                                           onClick={() => removeFile(matchingFile.name)}
-                                          className="text-muted-foreground hover:text-red-500 transition-colors p-1"
+                                          className="text-muted-foreground hover:text-red-500 transition-colors p-1 cursor-pointer"
                                           title="Remove Document"
                                         >
                                           <Trash2 className="h-3.5 w-3.5" />
@@ -671,12 +673,12 @@ export default function Onboard() {
                                       </div>
                                     </div>
                                   ) : (
-                                    <div className="flex items-center gap-3">
+                                    <div className="w-full flex justify-end">
                                       <label 
                                         htmlFor={`requirement-upload-${idx}`}
-                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-primary/40 text-primary hover:bg-primary/5 rounded-lg text-[10px] font-mono tracking-wider font-bold transition-all cursor-pointer hover:scale-102 active:scale-98 shadow-sm"
+                                        className="inline-flex items-center justify-center gap-1.5 w-full sm:w-auto px-4 py-2 border border-primary/40 text-primary hover:bg-primary/5 rounded-xl text-[10px] font-mono tracking-widest font-bold transition-all cursor-pointer hover:scale-102 active:scale-98 shadow-sm h-10"
                                       >
-                                        <Upload className="h-3 w-3" /> UPLOAD DOCUMENT
+                                        <Upload className="h-3.5 w-3.5" /> UPLOAD DOCUMENT
                                       </label>
                                       <input 
                                         type="file"
@@ -688,7 +690,6 @@ export default function Onboard() {
                                         }}
                                         className="hidden" 
                                       />
-                                      <span className="text-[10px] text-muted-foreground font-sans">No file uploaded</span>
                                     </div>
                                   )}
                                 </div>
