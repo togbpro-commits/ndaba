@@ -275,7 +275,7 @@ export default function Home() {
             <Phone className="h-3 w-3 text-primary" /> CALL FIRM (012 711 0427)
           </a>
           <span>·</span>
-          <a href="https://wa.me/27824906285" className="hover:text-foreground flex items-center gap-1 transition-colors">
+          <a href="https://wa.me/27734783775" className="hover:text-foreground flex items-center gap-1 transition-colors">
             <MessageSquare className="h-3 w-3 text-green-500 animate-pulse" /> WHATSAPP CHAT
           </a>
         </motion.div>

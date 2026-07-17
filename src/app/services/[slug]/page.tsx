@@ -174,10 +174,10 @@ export default function ServicePage() {
               <Phone className="h-3.5 w-3.5" /> CALL OFFICE
             </a>
             <a 
-              href="https://wa.me/27824906285" 
+              href="https://wa.me/27734783775" 
               className="border border-border bg-card hover:bg-border/10 font-mono text-[10px] tracking-widest text-foreground font-bold px-6 py-3 rounded-full flex items-center gap-1"
             >
-              <MessageSquare className="h-3.5 w-3.5 text-green-500" /> WHATSAPP
+              <MessageSquare className="h-3.5 w-3.5 text-green-500 animate-pulse" /> WHATSAPP
             </a>
           </div>
         </section>
