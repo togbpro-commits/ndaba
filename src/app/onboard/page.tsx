@@ -174,7 +174,7 @@ export default function Onboard() {
     }
   };
 
-  // Canvas drawing simulation
+  // Canvas drawing simulation (Desktop mouse events)
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -204,6 +204,40 @@ export default function Onboard() {
     ctx.stroke();
   };
 
+  // Canvas drawing simulation (Mobile touch events)
+  const startDrawingTouch = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault(); // Prevent page scrolling during signature drawing
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.strokeStyle = '#B76E79'; // Rose gold
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    ctx.beginPath();
+    ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    setIsDrawing(true);
+    setHasOnboardSigned(true);
+  };
+
+  const drawTouch = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault(); // Prevent page scrolling during signature drawing
+    if (!isDrawing) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+    ctx.stroke();
+  };
+
   const stopDrawing = () => {
     setIsDrawing(false);
   };
@@ -226,7 +260,11 @@ export default function Onboard() {
       return !!(formData.matterType && formData.matterDescription);
     }
     if (currentStep === 3) {
-      return true; // Files optional for demo, but highly recommended
+      const requiredGuides = getFicaGuidelines();
+      // Ensure there is a completed (progress = 100) file uploaded for each required guideline item
+      return requiredGuides.every(guide => 
+        uploadedFiles.some(f => f.requirementName === guide.label && f.progress === 100)
+      );
     }
     if (currentStep === 4) {
       return !!(formData.bookingDate && formData.bookingTime);
@@ -238,7 +276,11 @@ export default function Onboard() {
     if (validateStep(step)) {
       setStep(prev => (prev + 1) as OnboardStep);
     } else {
-      alert('Please fill out all required fields on this step to proceed.');
+      if (step === 3) {
+        alert('Please complete uploading all required certified FICA documents to proceed.');
+      } else {
+        alert('Please fill out all required fields on this step to proceed.');
+      }
     }
   };
 
@@ -820,6 +862,9 @@ export default function Onboard() {
                             onMouseMove={draw}
                             onMouseUp={stopDrawing}
                             onMouseLeave={stopDrawing}
+                            onTouchStart={startDrawingTouch}
+                            onTouchMove={drawTouch}
+                            onTouchEnd={stopDrawing}
                             width={320}
                             height={160}
                             className="w-full bg-background cursor-crosshair min-h-[160px]"
