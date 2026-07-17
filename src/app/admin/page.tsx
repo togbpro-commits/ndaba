@@ -152,7 +152,7 @@ export default function AdminDashboard() {
   const [notifyingCase, setNotifyingCase] = useState<Case | null>(null);
   const [notificationState, setNotificationState] = useState<'idle' | 'sending' | 'success'>('idle');
   const [notifyingCaseId, setNotifyingCaseId] = useState<string | null>(null);
-  const [notificationSubject, setNotificationSubject] = useState('Case Status Update - Ndabas Attorneys');
+  const [notificationSubject, setNotificationSubject] = useState("Case Status Update - Ndabas Attorneys");
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationMethod, setNotificationMethod] = useState<'Email' | 'WhatsApp'>('Email');
   const [isSendingNotification, setIsSendingNotification] = useState(false);
