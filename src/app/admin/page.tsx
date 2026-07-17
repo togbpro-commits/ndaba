@@ -104,6 +104,47 @@ export default function AdminDashboard() {
 
   const [activeTab, setActiveTab] = useState<'leads' | 'cases' | 'clients' | 'calendar' | 'reports'>('reports');
   const [selectedCalendarDay, setSelectedCalendarDay] = useState<number>(15);
+  const [calendarEvents, setCalendarEvents] = useState([
+    {
+      id: 1,
+      day: 15,
+      time: "10:00",
+      title: "Sipho Zuma Consultation",
+      desc: "Conveyancing & Erf 402, Hammanskraal property deeds verification session.",
+      type: "conveyancing",
+      operator: "info@ndabasattorneys.co.za",
+      status: "ACTIVE"
+    },
+    {
+      id: 2,
+      day: 22,
+      time: "11:30",
+      title: "Lerato & Kabelo Modise Signing",
+      desc: "Antenuptial Contract (ANC) with accrual system signing and notary public registry.",
+      type: "notary",
+      operator: "info@ndabasattorneys.co.za",
+      status: "ACTIVE"
+    },
+    {
+      id: 3,
+      day: 28,
+      time: "09:00",
+      title: "High Court Pre-Trial Briefing",
+      desc: "Mokoena Holdings partnership civil dispute High Court plea preparation.",
+      type: "litigation",
+      operator: "info@ndabasattorneys.co.za",
+      status: "ACTIVE"
+    }
+  ]);
+
+  // Calendar inline interactions form states
+  const [isReschedulingId, setIsReschedulingId] = useState<number | null>(null);
+  const [rescheduleDayInput, setRescheduleDayInput] = useState<number>(15);
+  const [isAddingCalendarEvent, setIsAddingCalendarEvent] = useState(false);
+  const [newCalTime, setNewCalTime] = useState("10:00");
+  const [newCalTitle, setNewCalTitle] = useState("");
+  const [newCalDesc, setNewCalDesc] = useState("");
+  const [newCalType, setNewCalType] = useState("conveyancing");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [cases, setCases] = useState<Case[]>([]);
   const [popiaLogs, setPopiaLogs] = useState<PopiaAuditLog[]>([]);
@@ -1740,9 +1781,11 @@ export default function AdminDashboard() {
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     {/* Visual Month Grid (July 2026) */}
                     <div className="lg:col-span-8 bg-card border border-border p-6 rounded-3xl shadow-sm space-y-4 text-left">
-                      <div className="flex justify-between items-center border-b border-border/40 pb-2">
+                      <div className="flex justify-between items-center border-b border-border/40 pb-2 select-none">
                         <h4 className="font-serif font-bold text-foreground text-sm tracking-wide">INTERACTIVE MEETINGS CALENDAR (JULY 2026)</h4>
-                        <span className="font-mono text-[9px] bg-primary/10 text-primary border border-primary/25 px-2 py-0.5 rounded">3 ACTIVE CONSULTATIONS</span>
+                        <span className="font-mono text-[9px] bg-primary/10 text-primary border border-primary/25 px-2.5 py-0.5 rounded font-bold">
+                          {calendarEvents.length} ACTIVE CONSULTATIONS
+                        </span>
                       </div>
 
                       {/* Weekday Labels */}
@@ -1765,27 +1808,37 @@ export default function AdminDashboard() {
                         {/* Day Blocks 1 to 31 */}
                         {Array.from({ length: 31 }, (_, idx) => {
                           const day = idx + 1;
-                          const hasMeeting = day === 15 || day === 22 || day === 28;
+                          const dayEvents = calendarEvents.filter(e => e.day === day);
+                          const hasMeeting = dayEvents.length > 0;
+                          const isSelected = selectedCalendarDay === day;
+
                           return (
                             <div 
                               key={day} 
-                              className={`aspect-square border border-border/40 rounded-xl p-1.5 flex flex-col justify-between transition-all select-none relative ${
-                                hasMeeting 
-                                  ? 'bg-primary/5 hover:bg-primary/15 border-primary/45 cursor-pointer shadow-sm shadow-primary/5 hover:scale-105 active:scale-95' 
-                                  : 'bg-background/50 hover:bg-border/20 text-muted-foreground'
+                              onClick={() => {
+                                setSelectedCalendarDay(day);
+                                setIsReschedulingId(null); // Reset reschedule state on day change
+                                setIsAddingCalendarEvent(false); // Reset add state
+                              }}
+                              className={`aspect-square border rounded-xl p-1.5 flex flex-col justify-between transition-all select-none relative cursor-pointer ${
+                                isSelected
+                                  ? 'ring-2 ring-primary border-primary bg-primary/10 scale-102 shadow-sm shadow-primary/10 z-10'
+                                  : hasMeeting 
+                                    ? 'bg-primary/5 hover:bg-primary/15 border-primary/35 hover:scale-103 shadow-xs' 
+                                    : 'bg-background/50 hover:bg-border/20 text-muted-foreground border-border/40'
                               }`}
-                              title={
-                                day === 15 ? 'Consultation - Sipho Zuma @ 10:00' :
-                                day === 22 ? 'Notary Signing - Lerato Modise @ 11:30' :
-                                day === 28 ? 'Deeds Lodgement - Sipho Zuma @ 09:00' : undefined
-                              }
                             >
-                              <span className={`font-bold block text-left ${hasMeeting ? 'text-primary' : ''}`}>{day}</span>
+                              <span className={`font-bold block text-left ${hasMeeting || isSelected ? 'text-primary' : ''}`}>{day}</span>
                               
                               {/* Meeting Indicators */}
                               {hasMeeting && (
                                 <div className="flex gap-1 justify-end items-center mt-1">
-                                  <span className={`w-1.5 h-1.5 rounded-full ${day === 22 ? 'bg-accent' : 'bg-primary'}`} />
+                                  {dayEvents.map((evt, eIdx) => (
+                                    <span 
+                                      key={eIdx} 
+                                      className={`w-1.5 h-1.5 rounded-full ${evt.type === 'notary' ? 'bg-accent' : 'bg-primary'}`} 
+                                    />
+                                  ))}
                                   <span className="hidden sm:inline-block text-[7px] font-mono text-primary font-black">SESS</span>
                                 </div>
                               )}
@@ -1796,43 +1849,213 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Calendar Selected Schedule Detail Box */}
-                    <div className="lg:col-span-4 bg-card border border-border p-6 rounded-3xl shadow-sm text-left flex flex-col justify-between">
-                      <div className="space-y-3">
+                    <div className="lg:col-span-4 bg-card border border-border p-6 rounded-3xl shadow-sm text-left flex flex-col justify-between min-h-[350px]">
+                      <div className="space-y-4">
                         <div className="border-b border-border/40 pb-3">
                           <span className="font-mono text-[8px] tracking-[0.2em] text-primary font-bold block uppercase">CALENDAR MATTERS BRIEF</span>
-                          <h5 className="font-serif font-bold text-sm text-foreground">Schedules and Trust Notices</h5>
+                          <h5 className="font-serif font-bold text-sm text-foreground">Schedule for July {selectedCalendarDay}, 2026</h5>
                         </div>
 
                         <div className="space-y-4 font-sans text-xs">
-                          {/* Event 1 */}
-                          <div className="border-l-2 border-primary pl-3 py-1 space-y-1">
-                            <div className="flex justify-between items-center text-[10px] font-mono">
-                              <span className="text-primary font-bold">JULY 15, 2026 • 10:00</span>
-                              <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded text-[8px]">ACTIVE</span>
-                            </div>
-                            <h6 className="font-bold text-foreground">Sipho Zuma Consultation</h6>
-                            <p className="text-muted-foreground text-[11px] leading-relaxed">Conveyancing & Deeds Registry verification session.</p>
-                          </div>
+                          {calendarEvents.filter(e => e.day === selectedCalendarDay).length > 0 ? (
+                            calendarEvents.filter(e => e.day === selectedCalendarDay).map((evt) => {
+                              const isReschedulingThis = isReschedulingId === evt.id;
 
-                          {/* Event 2 */}
-                          <div className="border-l-2 border-accent pl-3 py-1 space-y-1">
-                            <div className="flex justify-between items-center text-[10px] font-mono">
-                              <span className="text-accent font-bold">JULY 22, 2026 • 11:30</span>
-                              <span className="bg-accent/10 text-accent px-1.5 py-0.5 rounded text-[8px]">ACTIVE</span>
-                            </div>
-                            <h6 className="font-bold text-foreground">Lerato & Kabelo Modise Signing</h6>
-                            <p className="text-muted-foreground text-[11px] leading-relaxed">Antenuptial Contract drafting and notary validation.</p>
-                          </div>
+                              return (
+                                <div key={evt.id} className="bg-background border border-border/55 p-3.5 rounded-2xl space-y-3 shadow-xs">
+                                  <div className={`border-l-2 pl-2.5 py-0.5 space-y-1 ${evt.type === 'notary' ? 'border-accent' : 'border-primary'}`}>
+                                    <div className="flex justify-between items-center text-[10px] font-mono">
+                                      <span className={`${evt.type === 'notary' ? 'text-accent' : 'text-primary'} font-bold`}>JULY {evt.day} • {evt.time}</span>
+                                      <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded text-[8px] font-mono font-bold uppercase">{evt.status}</span>
+                                    </div>
+                                    <h6 className="font-bold text-foreground text-[12px]">{evt.title}</h6>
+                                    <p className="text-muted-foreground text-[11px] leading-relaxed font-sans">{evt.desc}</p>
+                                  </div>
 
-                          {/* Event 3 */}
-                          <div className="border-l-2 border-primary pl-3 py-1 space-y-1">
-                            <div className="flex justify-between items-center text-[10px] font-mono">
-                              <span className="text-primary font-bold">JULY 28, 2026 • 09:00</span>
-                              <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded text-[8px]">ACTIVE</span>
+                                  {/* Rescheduling Form */}
+                                  {isReschedulingThis ? (
+                                    <div className="pt-2 border-t border-border/50 space-y-2 font-mono text-[10px]">
+                                      <div className="flex items-center gap-2">
+                                        <label className="text-muted-foreground uppercase font-bold text-[8px] tracking-wider shrink-0">NEW DAY (1-31):</label>
+                                        <input 
+                                          type="number" 
+                                          min={1} 
+                                          max={31}
+                                          value={rescheduleDayInput}
+                                          onChange={(e) => setRescheduleDayInput(Math.min(31, Math.max(1, parseInt(e.target.value) || 1)))}
+                                          className="w-16 bg-card border border-border px-2 py-1 rounded text-center text-foreground font-bold"
+                                        />
+                                      </div>
+                                      <div className="flex gap-2 font-mono text-[9px] font-bold">
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setCalendarEvents(prev => prev.map(e => e.id === evt.id ? { ...e, day: rescheduleDayInput } : e));
+                                            setIsReschedulingId(null);
+                                            setSelectedCalendarDay(rescheduleDayInput);
+                                            showToast(`Rescheduled consultation successfully to July ${rescheduleDayInput}! 📅`, 'success');
+                                          }}
+                                          className="bg-primary text-primary-foreground border border-primary/20 px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity cursor-pointer"
+                                        >
+                                          SAVE DATE
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => setIsReschedulingId(null)}
+                                          className="bg-card border border-border px-3 py-1.5 rounded-lg text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                                        >
+                                          CANCEL
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    /* Interactive Control Buttons */
+                                    <div className="flex flex-wrap gap-2 pt-2 border-t border-border/40 font-mono text-[9px] font-bold">
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          showToast(`Dispatched email reminder for "${evt.title}" successfully! ✉️`, 'success');
+                                        }}
+                                        className="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 px-2.5 py-1.5 rounded-lg transition-all cursor-pointer inline-flex items-center gap-1"
+                                      >
+                                        <Send className="h-3 w-3" /> REMINDER
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setIsReschedulingId(evt.id);
+                                          setRescheduleDayInput(evt.day);
+                                        }}
+                                        className="bg-card border border-border hover:border-primary/50 text-muted-foreground hover:text-foreground px-2.5 py-1.5 rounded-lg transition-all cursor-pointer inline-flex items-center gap-1"
+                                      >
+                                        <Clock className="h-3 w-3 text-primary" /> RESCHEDULE
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          if (confirm(`Remove consultation "${evt.title}" on July ${evt.day}?`)) {
+                                            setCalendarEvents(prev => prev.filter(e => e.id !== evt.id));
+                                            showToast(`Removed consultation successfully.`, 'info');
+                                          }
+                                        }}
+                                        className="bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 px-2.5 py-1.5 rounded-lg transition-all cursor-pointer animate-none"
+                                      >
+                                        REMOVE
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })
+                          ) : (
+                            /* Open Slot and Reservation */
+                            <div className="text-center py-4 space-y-4 font-sans text-muted-foreground">
+                              {isAddingCalendarEvent ? (
+                                <div className="space-y-3 bg-background border border-border/55 p-4 rounded-2xl text-left font-sans text-xs">
+                                  <div className="border-b border-border pb-2 mb-2 flex items-center justify-between">
+                                    <strong className="text-foreground uppercase tracking-wider font-mono text-[8px] text-primary">ADD CONSULTATION</strong>
+                                    <button 
+                                      type="button" 
+                                      onClick={() => setIsAddingCalendarEvent(false)}
+                                      className="text-muted-foreground hover:text-foreground"
+                                    >
+                                      ✕
+                                    </button>
+                                  </div>
+                                  
+                                  <div className="space-y-1.5">
+                                    <label className="font-mono text-[8px] text-muted-foreground uppercase font-bold">Title Name</label>
+                                    <input 
+                                      type="text"
+                                      placeholder="Sipho Duma Consult"
+                                      value={newCalTitle}
+                                      onChange={(e) => setNewCalTitle(e.target.value)}
+                                      className="w-full bg-card border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-primary"
+                                    />
+                                  </div>
+
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <div className="space-y-1.5">
+                                      <label className="font-mono text-[8px] text-muted-foreground uppercase font-bold">Time</label>
+                                      <input 
+                                        type="text"
+                                        placeholder="14:00"
+                                        value={newCalTime}
+                                        onChange={(e) => setNewCalTime(e.target.value)}
+                                        className="w-full bg-card border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-primary font-mono text-center"
+                                      />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                      <label className="font-mono text-[8px] text-muted-foreground uppercase font-bold">Division</label>
+                                      <select 
+                                        value={newCalType}
+                                        onChange={(e) => setNewCalType(e.target.value)}
+                                        className="w-full bg-card border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-primary font-mono cursor-pointer"
+                                      >
+                                        <option value="conveyancing">Conveyance</option>
+                                        <option value="notary">Notary Act</option>
+                                        <option value="litigation">Litigation</option>
+                                      </select>
+                                    </div>
+                                  </div>
+
+                                  <div className="space-y-1.5">
+                                    <label className="font-mono text-[8px] text-muted-foreground uppercase font-bold">Details</label>
+                                    <input 
+                                      type="text"
+                                      placeholder="Property deeds check at Pretoria Registry..."
+                                      value={newCalDesc}
+                                      onChange={(e) => setNewCalDesc(e.target.value)}
+                                      className="w-full bg-card border border-border rounded-lg px-2.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-primary"
+                                    />
+                                  </div>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      if (!newCalTitle.trim()) {
+                                        alert('Please provide a title for the consultation.');
+                                        return;
+                                      }
+                                      setCalendarEvents(prev => [...prev, {
+                                        id: Date.now(),
+                                        day: selectedCalendarDay,
+                                        time: newCalTime,
+                                        title: newCalTitle,
+                                        desc: newCalDesc || "First consultation session with counsel.",
+                                        type: newCalType,
+                                        operator: user?.primaryEmailAddress?.emailAddress || "info@ndabasattorneys.co.za",
+                                        status: "ACTIVE"
+                                      }]);
+                                      setIsAddingCalendarEvent(false);
+                                      setNewCalTitle("");
+                                      setNewCalDesc("");
+                                      setNewCalTime("10:00");
+                                      showToast(`Consultation successfully added to July ${selectedCalendarDay}! 📅`, 'success');
+                                    }}
+                                    className="w-full bg-primary text-primary-foreground font-mono text-[9px] tracking-widest font-bold py-2 rounded-xl hover:opacity-90 cursor-pointer text-center"
+                                  >
+                                    ADD TO SCHEDULE
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="py-6 space-y-4 text-center">
+                                  <Clock className="h-7 w-7 text-muted-foreground/50 mx-auto" />
+                                  <div className="space-y-1">
+                                    <span className="font-bold text-foreground text-xs block font-sans">No Consultations Scheduled</span>
+                                    <span className="text-[11px] text-muted-foreground block leading-relaxed max-w-[200px] mx-auto font-sans">This July {selectedCalendarDay} schedule slot is empty and open.</span>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => setIsAddingCalendarEvent(true)}
+                                    className="inline-flex items-center gap-1.5 px-4.5 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-xl text-[10px] font-mono tracking-wider font-bold transition-all cursor-pointer hover:scale-102 active:scale-98 shadow-sm"
+                                  >
+                                    + RESERVE SLOT
+                                  </button>
+                                </div>
+                              )}
                             </div>
-                            <h6 className="font-bold text-foreground">Deeds Office Lodgement</h6>
-                            <p className="text-muted-foreground text-[11px] leading-relaxed">Erf 402, Hammanskraal property deed lodging.</p>
-                          </div>
+                          )}
                         </div>
                       </div>
 

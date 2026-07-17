@@ -95,10 +95,10 @@ export default function Fees() {
             <h2 className="font-serif text-2xl font-normal text-foreground">Conveyancing & Transfer Duty Cost Estimator</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
             
             {/* Left Column: Cost Input Fields */}
-            <div className="bg-card border border-border p-6 sm:p-8 rounded-3xl space-y-6 shadow-sm">
+            <div className="bg-card border border-border p-6 sm:p-8 rounded-3xl space-y-6 shadow-sm h-full flex flex-col justify-between">
               <div className="space-y-2 font-mono text-[10px] text-muted-foreground">
                 <label className="uppercase tracking-widest block font-bold">PROPERTY PURCHASE PRICE (ZAR)</label>
                 <div className="relative">
@@ -143,7 +143,7 @@ export default function Fees() {
             </div>
 
             {/* Right Column: Itemized Cost Card */}
-            <div className="bg-foreground text-background dark:bg-card dark:text-foreground border border-border rounded-3xl p-6 sm:p-8 space-y-6 shadow-md shadow-black/5 relative overflow-hidden">
+            <div className="bg-foreground text-background dark:bg-card dark:text-foreground border border-border rounded-3xl p-6 sm:p-8 space-y-6 shadow-md shadow-black/5 relative overflow-hidden h-full flex flex-col justify-between">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-lavender/10 to-accent/15 blur-2xl rounded-full"></div>
               
               <div className="border-b border-background/20 dark:border-border/60 pb-4">

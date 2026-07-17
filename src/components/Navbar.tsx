@@ -58,9 +58,9 @@ export default function Navbar() {
 
   return (
     <>
-      {/* 1. DESKTOP MAIN HEADER (Clean, non-squishing container) */}
-      <header className="fixed top-4 left-0 right-0 z-30 px-4 max-w-4xl mx-auto font-mono text-xs select-none">
-        <nav className="backdrop-blur-md bg-card/75 dark:bg-card/45 border border-border px-6 py-3 rounded-full flex items-center justify-between shadow-sm">
+      {/* 1. MAIN HEADER (Clean floating/edge-to-edge layout) */}
+      <header className="fixed top-4 left-0 right-0 md:left-1/2 md:-translate-x-1/2 w-full md:max-w-4xl z-30 px-4 font-mono text-xs select-none">
+        <nav className="md:backdrop-blur-md md:bg-card/75 dark:md:bg-card/45 md:border md:border-border px-0 md:px-6 py-2 md:py-3 md:rounded-full flex items-center justify-between md:shadow-sm">
           {/* Logo */}
           <a href="/" className="flex items-center gap-2 font-serif text-lg font-bold tracking-wide">
             <Scale className="h-5 w-5 text-primary" />

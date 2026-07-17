@@ -166,25 +166,29 @@ export default function Home() {
       title: "ATTORNEYS",
       description: "Comprehensive litigation, corporate legal representation, and legal advisory.",
       href: "/services/attorneys",
-      bgGradient: "from-amber-100 to-rose-100 dark:from-amber-950/20 dark:to-rose-950/20"
+      bgGradient: "from-amber-100 to-rose-100 dark:from-amber-950/20 dark:to-rose-950/20",
+      image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?q=80&w=400&auto=format&fit=crop"
     },
     {
       title: "CONVEYANCING",
       description: "Expert property transfers, deed registration, and real estate transactions.",
       href: "/services/conveyancing",
-      bgGradient: "from-rose-100 to-purple-100 dark:from-rose-950/20 dark:to-purple-950/20"
+      bgGradient: "from-rose-100 to-purple-100 dark:from-rose-950/20 dark:to-purple-950/20",
+      image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=400&auto=format&fit=crop"
     },
     {
       title: "NOTARY SERVICES",
       description: "Antenuptial contracts, authentication of legal documents, and official acts.",
       href: "/services/notary",
-      bgGradient: "from-purple-100 to-indigo-100 dark:from-purple-950/20 dark:to-indigo-950/20"
+      bgGradient: "from-purple-100 to-indigo-100 dark:from-purple-950/20 dark:to-indigo-950/20",
+      image: "https://images.unsplash.com/photo-1450133064473-71024230f91b?q=80&w=400&auto=format&fit=crop"
     },
     {
       title: "ADVOCACY",
       description: "High-court counsel representation and specialized trial advocacy.",
       href: "/services/advocacy",
-      bgGradient: "from-indigo-100 to-blue-100 dark:from-indigo-950/20 dark:to-blue-950/20"
+      bgGradient: "from-indigo-100 to-blue-100 dark:from-indigo-950/20 dark:to-blue-950/20",
+      image: "https://images.unsplash.com/photo-1449157291145-7efd050a4d0e?q=80&w=400&auto=format&fit=crop"
     }
   ];
 
@@ -195,7 +199,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-500 overflow-x-hidden">
+    <div className="relative min-h-screen bg-background text-foreground transition-colors duration-500 overflow-x-hidden">
       
       {/* Soft Prismatic Glow behind Hero */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[140%] h-[600px] pointer-events-none overflow-hidden select-none z-0">
@@ -276,6 +280,25 @@ export default function Home() {
           </a>
         </motion.div>
 
+        {/* Hero Office/Practice image */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="w-full border border-border/80 bg-card rounded-3xl overflow-hidden shadow-sm h-[200px] sm:h-[350px] relative mb-16 selection:pointer-events-none"
+        >
+          <img 
+            src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1000&auto=format&fit=crop" 
+            alt="Justice House Chambers Pretoria"
+            className="w-full h-full object-cover opacity-85 dark:opacity-40 hover:scale-[1.01] transition-transform duration-700 select-none pointer-events-none"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+          <div className="absolute bottom-4 left-6 text-left space-y-0.5 font-mono text-[9px] tracking-widest text-muted-foreground">
+            <span className="font-bold text-foreground uppercase block text-[11px] font-sans">Justice House Chambers</span>
+            <span>PRETORIA, GAUTENG · PRIMARY CHANCERY</span>
+          </div>
+        </motion.div>
+
         {/* 3. PRACTICE AREA HORIZONTAL RAIL */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -294,10 +317,20 @@ export default function Home() {
               <a 
                 href={svc.href}
                 key={sIdx}
-                className="group relative block bg-card hover:bg-card/85 border border-border/60 rounded-3xl p-6 transition-all duration-300 hover:shadow-md hover:-translate-y-1 overflow-hidden"
+                className="group relative block bg-card hover:bg-card/95 border border-border/60 rounded-3xl p-6 transition-all duration-300 hover:shadow-md hover:-translate-y-1 overflow-hidden"
               >
+                {/* Background image textured overlay */}
+                <div className="absolute inset-0 z-0">
+                  <img 
+                    src={svc.image} 
+                    alt={svc.title}
+                    className="w-full h-full object-cover opacity-[0.03] dark:opacity-[0.05] group-hover:opacity-[0.08] group-hover:scale-105 transition-all duration-500 select-none pointer-events-none"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent"></div>
+                </div>
+
                 {/* Visual Glow behind card */}
-                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${svc.bgGradient} blur-2xl rounded-full opacity-40 group-hover:opacity-75 transition-opacity`}></div>
+                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${svc.bgGradient} blur-2xl rounded-full opacity-35 group-hover:opacity-60 transition-opacity z-0`}></div>
 
                 <div className="relative z-10 flex flex-col h-full justify-between gap-6">
                   <div className="font-serif text-sm tracking-widest font-bold text-muted-foreground group-hover:text-primary transition-colors">
@@ -369,27 +402,159 @@ export default function Home() {
           </div>
 
           {/* Interactive Card */}
-          <div className="bg-card border border-border p-8 rounded-3xl shadow-sm font-mono text-xs select-none space-y-6 relative overflow-hidden">
+          <div className="bg-card border border-border p-8 rounded-3xl shadow-sm font-mono text-xs select-none space-y-6 relative overflow-hidden flex flex-col justify-between h-full">
             <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-lavender/10 to-accent/15 blur-2xl rounded-full"></div>
-            <div className="border-b border-border pb-4">
-              <span className="text-primary font-bold">VISIT JUSTICE HOUSE</span>
-              <h3 className="font-serif text-lg font-bold text-foreground mt-1">Hammanskraal Office</h3>
+            <div className="space-y-4">
+              <div className="border-b border-border pb-4">
+                <span className="text-primary font-bold">VISIT JUSTICE HOUSE</span>
+                <h3 className="font-serif text-lg font-bold text-foreground mt-1">Hammanskraal Office</h3>
+              </div>
+              <div className="space-y-3 font-sans text-xs">
+                <div className="flex gap-2.5 items-start">
+                  <MapPin className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span className="text-muted-foreground">2208C Block AA Portion 9, Hammanskraal, Gauteng</span>
+                </div>
+                <div className="flex gap-2.5 items-start">
+                  <Clock className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span className="text-muted-foreground">Mon - Fri: 08:00 - 16:30</span>
+                </div>
+                <div className="flex gap-2.5 items-start">
+                  <Phone className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <span className="text-muted-foreground">Tel: 012 711 0427 <br />Cell: 082 490 6285 / 073 478 3775</span>
+                </div>
+              </div>
             </div>
-            <div className="space-y-3">
-              <div className="flex gap-2.5 items-start">
-                <MapPin className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                <span className="text-muted-foreground">2208C Block AA Portion 9, Hammanskraal, Gauteng</span>
-              </div>
-              <div className="flex gap-2.5 items-start">
-                <Clock className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                <span className="text-muted-foreground">Mon - Fri: 08:00 - 16:30</span>
-              </div>
-              <div className="flex gap-2.5 items-start">
-                <Phone className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                <span className="text-muted-foreground">Tel: 012 711 0427 <br />Cell: 082 490 6285 / 073 478 3775</span>
-              </div>
+            
+            <div className="pt-4 border-t border-border/40">
+              <a href="/offices" className="text-primary font-mono text-[9px] tracking-widest font-bold inline-flex items-center gap-1 hover:translate-x-1.5 transition-transform duration-300 cursor-pointer">
+                VIEW OFFICE DIRECTIONS & OPERATIONS <ChevronRight className="h-3 w-3" />
+              </a>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* NEW: REGULATORY STANDARDS & COMPLIANCE RESOURCE HUB */}
+      <section className="py-20 bg-background border-b border-border px-4 select-none">
+        <div className="max-w-5xl mx-auto space-y-12">
+          
+          <div className="text-center space-y-3">
+            <span className="font-mono text-[10px] tracking-[0.25em] text-primary font-bold block">COMPLIANCE & LEGAL RESOURCE HUB</span>
+            <h2 className="font-serif text-3xl sm:text-4xl font-normal text-foreground">Firm Certification & Standards</h2>
+            <p className="text-muted-foreground text-xs sm:text-sm max-w-xl mx-auto leading-relaxed font-sans">
+              Ndabas Attorneys adheres strictly to statutory legal regulations, audits, and professional guidelines established by South African judicial authorities at Justice House.
+            </p>
+            <div className="h-[1px] w-12 bg-primary mx-auto"></div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            
+            {/* Card 1: LPC */}
+            <motion.div 
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0 }}
+              className="bg-card border border-border p-5 rounded-2xl shadow-sm hover:border-primary/20 transition-all duration-300 flex flex-col justify-between group cursor-default"
+            >
+              <div className="space-y-4">
+                <div className="p-2.5 bg-background border border-border/60 rounded-xl w-fit group-hover:border-primary/20 transition-all">
+                  <Award className="h-5 w-5 text-primary animate-pulse" />
+                </div>
+                <div className="space-y-1.5">
+                  <h3 className="font-serif font-bold text-foreground text-[13px] leading-snug">LPC Regulatory Compliance</h3>
+                  <p className="text-muted-foreground text-[11px] leading-relaxed font-sans">
+                    Fully registered under the South African Legal Practice Council. We carry indemnity coverage and maintain annual trust audits.
+                  </p>
+                </div>
+              </div>
+              <div className="pt-4 border-t border-border/40 mt-4">
+                <a href="/lpc-compliance" className="text-primary font-mono text-[9px] tracking-widest font-bold inline-flex items-center gap-1 hover:translate-x-1 transition-transform cursor-pointer">
+                  READ STANDARDS <ChevronRight className="h-3 w-3" />
+                </a>
+              </div>
+            </motion.div>
+
+            {/* Card 2: Deeds */}
+            <motion.div 
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="bg-card border border-border p-5 rounded-2xl shadow-sm hover:border-primary/20 transition-all duration-300 flex flex-col justify-between group cursor-default"
+            >
+              <div className="space-y-4">
+                <div className="p-2.5 bg-background border border-border/60 rounded-xl w-fit group-hover:border-primary/20 transition-all">
+                  <Scale className="h-5 w-5 text-primary" />
+                </div>
+                <div className="space-y-1.5">
+                  <h3 className="font-serif font-bold text-foreground text-[13px] leading-snug">Pretoria Deeds Office Rules</h3>
+                  <p className="text-muted-foreground text-[11px] leading-relaxed font-sans">
+                    Daily physical deeds submissions and SARS conveyancing clearance workflows for rapid property transfer registrations.
+                  </p>
+                </div>
+              </div>
+              <div className="pt-4 border-t border-border/40 mt-4">
+                <a href="/deeds-registry" className="text-primary font-mono text-[9px] tracking-widest font-bold inline-flex items-center gap-1 hover:translate-x-1 transition-transform cursor-pointer">
+                  READ DEEDS PROCESS <ChevronRight className="h-3 w-3" />
+                </a>
+              </div>
+            </motion.div>
+
+            {/* Card 3: FICA */}
+            <motion.div 
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="bg-card border border-border p-5 rounded-2xl shadow-sm hover:border-primary/20 transition-all duration-300 flex flex-col justify-between group cursor-default"
+            >
+              <div className="space-y-4">
+                <div className="p-2.5 bg-background border border-border/60 rounded-xl w-fit group-hover:border-primary/20 transition-all">
+                  <Info className="h-5 w-5 text-primary" />
+                </div>
+                <div className="space-y-1.5">
+                  <h3 className="font-serif font-bold text-foreground text-[13px] leading-snug">FICA Client Identification</h3>
+                  <p className="text-muted-foreground text-[11px] leading-relaxed font-sans">
+                    Mandatory legal identification rules for individuals, companies, and trusts. Mandatory verification before file opening.
+                  </p>
+                </div>
+              </div>
+              <div className="pt-4 border-t border-border/40 mt-4">
+                <a href="/fica-rules" className="text-primary font-mono text-[9px] tracking-widest font-bold inline-flex items-center gap-1 hover:translate-x-1 transition-transform cursor-pointer">
+                  READ FICA CARD <ChevronRight className="h-3 w-3" />
+                </a>
+              </div>
+            </motion.div>
+
+            {/* Card 4: POPIA */}
+            <motion.div 
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="bg-card border border-border p-5 rounded-2xl shadow-sm hover:border-primary/20 transition-all duration-300 flex flex-col justify-between group cursor-default"
+            >
+              <div className="space-y-4">
+                <div className="p-2.5 bg-background border border-border/60 rounded-xl w-fit group-hover:border-primary/20 transition-all">
+                  <CheckCircle className="h-5 w-5 text-primary" />
+                </div>
+                <div className="space-y-1.5">
+                  <h3 className="font-serif font-bold text-foreground text-[13px] leading-snug">POPIA Shield Privacy Ledger</h3>
+                  <p className="text-muted-foreground text-[11px] leading-relaxed font-sans">
+                    Complete data protection with local browser encryption and automatic compliance logging of all document access.
+                  </p>
+                </div>
+              </div>
+              <div className="pt-4 border-t border-border/40 mt-4">
+                <a href="/popia-policy" className="text-primary font-mono text-[9px] tracking-widest font-bold inline-flex items-center gap-1 hover:translate-x-1 transition-transform cursor-pointer">
+                  READ PRIVACY REGIME <ChevronRight className="h-3 w-3" />
+                </a>
+              </div>
+            </motion.div>
+
+          </div>
+
         </div>
       </section>
 
@@ -582,30 +747,42 @@ export default function Home() {
       <section className="py-20 px-4 max-w-5xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           
-          <div className="bg-card border border-border rounded-3xl p-8 relative overflow-hidden shadow-lg flex flex-col justify-between min-h-[380px]">
+          <div className="bg-card border border-border rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-lg flex flex-col justify-between min-h-[380px] h-full">
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-lavender/5 to-accent/10 blur-xl rounded-full"></div>
             
-            <div className="space-y-4 relative z-10 font-mono text-xs">
-              <div className="border-b border-border pb-4">
-                <span className="text-primary font-bold uppercase tracking-widest text-[9px]">DIRECTOR SPOTLIGHT</span>
-                <h3 className="font-serif text-2xl font-normal text-foreground mt-1">Advocate Ndaba</h3>
-                <p className="text-muted-foreground text-[10px] tracking-wider mt-1 uppercase font-mono">ADVOCATE & DIRECTING COUNSEL</p>
+            <div className="space-y-6 relative z-10 font-mono text-xs h-full flex flex-col justify-between">
+              
+              {/* Flex Grid of portrait and details */}
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <img 
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop" 
+                  alt="Advocate Ndaba"
+                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border border-border shadow-sm shrink-0"
+                />
+                <div className="space-y-1.5 flex-grow">
+                  <div className="border-b border-border pb-3 text-left">
+                    <span className="text-primary font-bold uppercase tracking-widest text-[8px]">DIRECTOR & FOUNDER</span>
+                    <h3 className="font-serif text-xl sm:text-2xl font-normal text-foreground mt-1">Advocate Ndaba</h3>
+                    <p className="text-muted-foreground text-[10px] tracking-wider mt-1 uppercase font-mono">Admitted Advocate & Conveyancer</p>
+                  </div>
+                </div>
               </div>
 
-              <p className="text-muted-foreground text-xs leading-relaxed font-sans pt-2">
+              <p className="text-muted-foreground text-xs leading-relaxed font-sans text-left">
                 Advocate Ndaba manages and directs litigation files, conveyancing transfers, and antenuptial acts at Justice House. With extensive legal practice credentials, Adv. Ndaba provides accessible bilingual representation across Pretoria and Gauteng.
               </p>
 
-              <div className="grid grid-cols-2 gap-x-6 gap-y-3 font-mono text-[10px] tracking-wide text-muted-foreground pt-4 border-t border-border/60">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-3 font-mono text-[9px] tracking-wide text-muted-foreground pt-4 border-t border-border/60 text-left">
                 <div>
-                  <strong className="text-foreground block text-[8px] tracking-widest uppercase">LPC REGISTRATION</strong>
-                  <span>Active LPC Credentials</span>
+                  <strong className="text-foreground block text-[8px] tracking-widest uppercase mb-0.5">LPC REGISTRATION</strong>
+                  <span>Admitted High Court Counsel</span>
                 </div>
                 <div>
-                  <strong className="text-foreground block text-[8px] tracking-widest uppercase">LANGUAGES SERVED</strong>
+                  <strong className="text-foreground block text-[8px] tracking-widest uppercase mb-0.5">LANGUAGES SERVED</strong>
                   <span>Sotho · Tswana · Zulu · English</span>
                 </div>
               </div>
+
             </div>
           </div>
 
@@ -614,7 +791,7 @@ export default function Home() {
             <h2 className="font-serif text-3xl sm:text-4xl font-normal leading-tight text-foreground">
               Empathetic counsel backed by legal authority.
             </h2>
-            <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+            <p className="text-muted-foreground text-sm sm:text-base leading-relaxed font-sans">
               We believe legal transactions shouldn't feel alienating. Advocate Ndaba coordinates our staff with local bilingual expertise so that every contract, rates clearance, and civil claim is clearly explained to you step-by-step.
             </p>
             <div className="pt-2 font-mono text-xs">
@@ -623,6 +800,111 @@ export default function Home() {
               </a>
             </div>
           </div>
+
+        </div>
+      </section>
+
+      {/* NEW: INFINITE TESTIMONIAL MARQUEE (NO HORIZONTAL SCROLL) */}
+      <section className="py-20 border-t border-border bg-card/5 select-none overflow-hidden relative">
+        <div className="max-w-5xl mx-auto px-4 text-center space-y-4 mb-12">
+          <span className="font-mono text-[10px] tracking-[0.25em] text-primary font-bold block uppercase">CLIENT EXPERIENCES</span>
+          <h2 className="font-serif text-3xl sm:text-4xl font-normal text-foreground">What Our Clients Say</h2>
+          <p className="text-muted-foreground text-xs sm:text-sm max-w-lg mx-auto leading-relaxed font-sans">
+            Read verified reviews from clients across Pretoria silver lakes and Hammanskraal who registered properties or trusts with our firm.
+          </p>
+          <div className="h-[1px] w-12 bg-primary mx-auto"></div>
+        </div>
+
+        {/* Marquee container with absolute mask gradients */}
+        <div className="relative w-full overflow-hidden flex items-center">
+          
+          {/* Elegant Left/Right Gradient Fades */}
+          <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none"></div>
+          <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none"></div>
+
+          {/* Scrolling Row using Framer Motion */}
+          <motion.div 
+            className="flex gap-6 w-max"
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{
+              ease: "linear",
+              duration: 25,
+              repeat: Infinity
+            }}
+          >
+            {[
+              {
+                name: "Naledi Dlamini",
+                role: "Pretoria East Homeowner",
+                text: "Ndabas Attorneys handled my conveyancing transfer in Hammanskraal with absolute precision. Registered in 7 weeks! Transparent fees throughout.",
+                img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=120&auto=format&fit=crop"
+              },
+              {
+                name: "Johan Groenewald",
+                role: "Silver Lakes Newlywed",
+                text: "Adv. Ndaba drafted our Antenuptial Contract at Justice House. The advice on the Accrual System was incredibly clear. Excellent notary service.",
+                img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=120&auto=format&fit=crop"
+              },
+              {
+                name: "Thabo Mokoena",
+                role: "Director, Mokoena Holdings",
+                text: "Stunning CRM tracking on the site! Being able to verify our litigation files and check milestones in real-time is revolutionary for local firms.",
+                img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=120&auto=format&fit=crop"
+              },
+              {
+                name: "Zanele Sithole",
+                role: "Hammanskraal Litigant",
+                text: "We briefed Adv. Ndaba for a regional court dispute and were impressed by his bilingual mastery and trial presence. Reliable and expert counsel.",
+                img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=120&auto=format&fit=crop"
+              }
+            ].concat([
+              {
+                name: "Naledi Dlamini",
+                role: "Pretoria East Homeowner",
+                text: "Ndabas Attorneys handled my conveyancing transfer in Hammanskraal with absolute precision. Registered in 7 weeks! Transparent fees throughout.",
+                img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=120&auto=format&fit=crop"
+              },
+              {
+                name: "Johan Groenewald",
+                role: "Silver Lakes Newlywed",
+                text: "Adv. Ndaba drafted our Antenuptial Contract at Justice House. The advice on the Accrual System was incredibly clear. Excellent notary service.",
+                img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=120&auto=format&fit=crop"
+              },
+              {
+                name: "Thabo Mokoena",
+                role: "Director, Mokoena Holdings",
+                text: "Stunning CRM tracking on the site! Being able to verify our litigation files and check milestones in real-time is revolutionary for local firms.",
+                img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=120&auto=format&fit=crop"
+              },
+              {
+                name: "Zanele Sithole",
+                role: "Hammanskraal Litigant",
+                text: "We briefed Adv. Ndaba for a regional court dispute and were impressed by his bilingual mastery and trial presence. Reliable and expert counsel.",
+                img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=120&auto=format&fit=crop"
+              }
+            ]).map((item, idx) => (
+              <div 
+                key={idx}
+                className="w-[280px] sm:w-[350px] bg-card border border-border p-6 rounded-3xl shadow-sm flex flex-col justify-between gap-6 shrink-0 relative overflow-hidden group select-none hover:border-primary/25 transition-colors text-left"
+              >
+                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-lavender/5 to-accent/5 blur-xl rounded-full"></div>
+                <p className="text-muted-foreground text-xs leading-relaxed font-sans italic relative z-10">
+                  &ldquo;{item.text}&rdquo;
+                </p>
+                <div className="flex items-center gap-3.5 relative z-10 border-t border-border/50 pt-4">
+                  <img 
+                    src={item.img} 
+                    alt={item.name}
+                    className="w-10 h-10 rounded-full object-cover border border-primary/20 shrink-0"
+                  />
+                  <div className="space-y-0.5 font-sans">
+                    <span className="font-bold text-foreground text-xs block">{item.name}</span>
+                    <span className="text-[10px] text-muted-foreground block">{item.role}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </motion.div>
 
         </div>
       </section>
