@@ -625,158 +625,89 @@ export default function Onboard() {
                       <p className="text-muted-foreground text-xs leading-relaxed">Prepare and upload the necessary legal documentation according to your matter type.</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                      
-                      {/* Left: Dynamic Checklist Display with Inline Uploaders (Stable Heights) */}
-                      <div className="space-y-4">
-                        <span className="font-mono text-[9px] tracking-widest text-primary font-bold block uppercase bg-primary/10 px-2.5 py-1 rounded w-fit">REQUIRED AT JUSTICE HOUSE</span>
-                        <div className="space-y-3">
-                          {getFicaGuidelines().map((guide, idx) => {
-                            // Find if there is an uploaded file for this specific guideline requirement
-                            const matchingFile = uploadedFiles.find(f => f.requirementName === guide.label);
+                    {/* Streamlined FICA checklist document upload (Single Unified Column) */}
+                    <div className="space-y-6">
+                      <span className="font-mono text-[9px] tracking-widest text-primary font-bold block uppercase bg-primary/10 px-2.5 py-1 rounded w-fit">REQUIRED AT JUSTICE HOUSE</span>
+                      <div className="space-y-3">
+                        {getFicaGuidelines().map((guide, idx) => {
+                          // Find if there is an uploaded file for this specific guideline requirement
+                          const matchingFile = uploadedFiles.find(f => f.requirementName === guide.label);
 
-                            return (
-                              <div key={idx} className="bg-card border border-border/65 p-4 rounded-2xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 min-h-[96px] sm:min-h-[80px] transition-all hover:border-primary/10 relative overflow-hidden select-none">
-                                <div className="flex gap-3 items-start max-w-full sm:max-w-[55%]">
-                                  <CheckCircle2 className={`h-5 w-5 shrink-0 mt-0.5 ${matchingFile?.progress === 100 ? 'text-green-500' : 'text-primary'}`} />
-                                  <div className="space-y-1 text-left font-sans">
-                                    <span className="font-bold text-foreground text-xs block">{guide.label}</span>
-                                    <span className="text-muted-foreground text-[10.5px] leading-relaxed block line-clamp-2 sm:line-clamp-1" title={guide.desc}>{guide.desc}</span>
-                                  </div>
-                                </div>
-
-                                {/* Right Side: Compact, stable-height uploader or file info */}
-                                <div className="shrink-0 w-full sm:w-[220px] h-10 flex items-center justify-end">
-                                  {matchingFile ? (
-                                    <div className="bg-background border border-border rounded-xl px-2.5 py-1.5 w-full h-full flex items-center justify-between gap-3 text-[10px] shadow-xs relative animate-fade-in">
-                                      <div className="flex items-center gap-2 truncate max-w-[70%]">
-                                        <File className="h-3.5 w-3.5 text-primary shrink-0 animate-pulse" />
-                                        <div className="truncate space-y-0.5">
-                                          <span className="font-bold text-foreground block truncate" title={matchingFile.name}>{matchingFile.name}</span>
-                                          <span className="text-[9px] text-muted-foreground block font-mono">{matchingFile.size} · {matchingFile.progress === 100 ? 'Uploaded ✅' : `${matchingFile.progress}%`}</span>
-                                        </div>
-                                      </div>
-                                      <div className="flex items-center gap-2 shrink-0">
-                                        {matchingFile.progress < 100 && (
-                                          <div className="h-1 w-8 bg-border rounded-full overflow-hidden">
-                                            <div className="h-full bg-primary" style={{ width: `${matchingFile.progress}%` }}></div>
-                                          </div>
-                                        )}
-                                        <button 
-                                          type="button"
-                                          onClick={() => removeFile(matchingFile.name)}
-                                          className="text-muted-foreground hover:text-red-500 transition-colors p-1 cursor-pointer"
-                                          title="Remove Document"
-                                        >
-                                          <Trash2 className="h-3.5 w-3.5" />
-                                        </button>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <div className="w-full flex justify-end">
-                                      <label 
-                                        htmlFor={`requirement-upload-${idx}`}
-                                        className="inline-flex items-center justify-center gap-1.5 w-full sm:w-auto px-4 py-2 border border-primary/40 text-primary hover:bg-primary/5 rounded-xl text-[10px] font-mono tracking-widest font-bold transition-all cursor-pointer hover:scale-102 active:scale-98 shadow-sm h-10"
-                                      >
-                                        <Upload className="h-3.5 w-3.5" /> UPLOAD DOCUMENT
-                                      </label>
-                                      <input 
-                                        type="file"
-                                        id={`requirement-upload-${idx}`}
-                                        onChange={(e) => {
-                                          if (e.target.files && e.target.files.length > 0) {
-                                            addRealFiles([e.target.files[0]], guide.label);
-                                          }
-                                        }}
-                                        className="hidden" 
-                                      />
-                                    </div>
-                                  )}
+                          return (
+                            <div key={idx} className="bg-card border border-border/65 p-4 rounded-2xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 min-h-[96px] sm:min-h-[80px] transition-all hover:border-primary/10 relative overflow-hidden select-none">
+                              <div className="flex gap-3.5 items-start max-w-full sm:max-w-[65%]">
+                                <CheckCircle2 className={`h-5 w-5 shrink-0 mt-0.5 ${matchingFile?.progress === 100 ? 'text-green-500' : 'text-primary'}`} />
+                                <div className="space-y-1 text-left font-sans">
+                                  <span className="font-bold text-foreground text-xs block">{guide.label}</span>
+                                  <span className="text-muted-foreground text-[10.5px] leading-relaxed block" title={guide.desc}>{guide.desc}</span>
                                 </div>
                               </div>
-                            );
-                          })}
-                        </div>
-                      </div>
 
-                      {/* Right: Additional Supporting Documents & General List */}
-                      <div className="space-y-4">
-                        <div className="space-y-1.5">
-                          <span className="font-mono text-[9px] tracking-widest text-muted-foreground font-bold block uppercase">ADDITIONAL DOCUMENTATION</span>
-                          <p className="text-muted-foreground text-[11px] leading-relaxed">
-                            Drag or select any other custom files (spouse ID, bank statements, tax documents) to support your FICA file registration.
-                          </p>
-                        </div>
-
-                        <div 
-                          onDragOver={handleDragOver}
-                          onDragLeave={handleDragLeave}
-                          onDrop={handleDrop}
-                          onClick={() => fileInputRef.current?.click()}
-                          className={`border border-dashed rounded-3xl p-6 text-center cursor-pointer transition-all duration-300 flex flex-col items-center justify-center gap-3 relative overflow-hidden select-none min-h-[140px] ${isDragging ? 'bg-primary/5 border-primary scale-[0.98]' : 'bg-background hover:bg-card/30 border-border/80'}`}
-                        >
-                          <input 
-                            type="file" 
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
-                            multiple 
-                            className="hidden" 
-                          />
-                          <div className="p-2.5 bg-card border border-border rounded-xl shadow-sm">
-                            <Upload className="h-5 w-5 text-primary" />
-                          </div>
-                          <div className="space-y-0.5 font-sans text-[11px]">
-                            <span className="font-bold text-foreground block">General Drag & Drop</span>
-                            <span className="text-muted-foreground text-[10px]">Add supplementary matter attachments.</span>
-                          </div>
-                        </div>
-
-                        {/* List of general (non-requirement) files */}
-                        {uploadedFiles.filter(f => !f.requirementName).length > 0 && (
-                          <div className="space-y-2">
-                            <span className="font-mono text-[8px] tracking-widest text-muted-foreground block uppercase font-bold">SUPPLEMENTARY FILES:</span>
-                            <div className="space-y-2 max-h-[120px] overflow-y-auto pr-1">
-                              {uploadedFiles.filter(f => !f.requirementName).map((file, fIdx) => (
-                                <div key={fIdx} className="bg-background border border-border rounded-xl p-3 flex items-center justify-between gap-3 text-xs shadow-sm">
-                                  <div className="flex items-center gap-2 max-w-[70%]">
-                                    <File className="h-4 w-4 text-primary shrink-0" />
-                                    <div className="space-y-1 truncate">
-                                      <span className="font-bold text-foreground block truncate">{file.name}</span>
-                                      <span className="text-[10px] text-muted-foreground block">{file.size} · {file.progress === 100 ? '100% - Complete! ✅' : `${file.progress}%`}</span>
+                              {/* Right Side: Compact, stable-height uploader or file info */}
+                              <div className="shrink-0 w-full sm:w-[220px] h-10 flex items-center justify-end">
+                                {matchingFile ? (
+                                  <div className="bg-background border border-border rounded-xl px-2.5 py-1.5 w-full h-full flex items-center justify-between gap-3 text-[10px] shadow-xs relative animate-fade-in">
+                                    <div className="flex items-center gap-2 truncate max-w-[70%]">
+                                      <File className="h-3.5 w-3.5 text-primary shrink-0 animate-pulse" />
+                                      <div className="truncate space-y-0.5">
+                                        <span className="font-bold text-foreground block truncate" title={matchingFile.name}>{matchingFile.name}</span>
+                                        <span className="text-[9px] text-muted-foreground block font-mono">{matchingFile.size} · {matchingFile.progress === 100 ? 'Uploaded ✅' : `${matchingFile.progress}%`}</span>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                      {matchingFile.progress < 100 && (
+                                        <div className="h-1 w-8 bg-border rounded-full overflow-hidden">
+                                          <div className="h-full bg-primary" style={{ width: `${matchingFile.progress}%` }}></div>
+                                        </div>
+                                      )}
+                                      <button 
+                                        type="button"
+                                        onClick={() => removeFile(matchingFile.name)}
+                                        className="text-muted-foreground hover:text-red-500 transition-colors p-1 cursor-pointer"
+                                        title="Remove Document"
+                                      >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                      </button>
                                     </div>
                                   </div>
-                                  <div className="flex items-center gap-3 shrink-0">
-                                    <div className="h-1.5 w-14 bg-border rounded-full overflow-hidden">
-                                      <div className={`h-full ${file.progress === 100 ? 'bg-green-500' : 'bg-primary'}`} style={{ width: `${file.progress}%` }}></div>
-                                    </div>
-                                    <button 
-                                      type="button"
-                                      onClick={() => removeFile(file.name)}
-                                      className="text-muted-foreground hover:text-red-500 transition-colors"
+                                ) : (
+                                  <div className="w-full flex justify-end">
+                                    <label 
+                                      htmlFor={`requirement-upload-${idx}`}
+                                      className="inline-flex items-center justify-center gap-1.5 w-full sm:w-auto px-4 py-2 border border-primary/40 text-primary hover:bg-primary/5 rounded-xl text-[10px] font-mono tracking-widest font-bold transition-all cursor-pointer hover:scale-102 active:scale-98 shadow-sm h-10"
                                     >
-                                      <Trash2 className="h-4 w-4" />
-                                    </button>
+                                      <Upload className="h-3.5 w-3.5" /> UPLOAD DOCUMENT
+                                    </label>
+                                    <input 
+                                      type="file"
+                                      id={`requirement-upload-${idx}`}
+                                      onChange={(e) => {
+                                        if (e.target.files && e.target.files.length > 0) {
+                                          addRealFiles([e.target.files[0]], guide.label);
+                                        }
+                                      }}
+                                      className="hidden" 
+                                    />
                                   </div>
-                                </div>
-                              ))}
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )}
-
-                        {/* Interactive developer sandbox helper note */}
-                        {uploadedFiles.some(f => f.url && f.url.startsWith('blob:')) && (
-                          <div className="bg-primary/5 border border-primary/20 p-4 rounded-2xl flex gap-3 text-[11px] leading-relaxed text-muted-foreground font-sans mt-3 animate-fade-in">
-                            <ShieldCheck className="h-4.5 w-4.5 text-primary shrink-0 mt-0.5" />
-                            <div>
-                              <strong className="text-foreground block mb-0.5">Local Encrypted Sandbox Mode</strong>
-                              Your files are saved securely inside your local browser memory sandbox because cloud file storage is not configured yet. 
-                              <br className="mb-2 block" />
-                              <strong className="text-foreground">To enable cloud uploads:</strong> Please ensure your secure database storage buckets are correctly initialized and verified inside your backend database console!
-                            </div>
-                          </div>
-                        )}
+                          );
+                        })}
                       </div>
 
+                      {/* Interactive developer sandbox helper note */}
+                      {uploadedFiles.some(f => f.url && f.url.startsWith('blob:')) && (
+                        <div className="bg-primary/5 border border-primary/20 p-5 rounded-2xl flex gap-3.5 items-start text-xs max-w-xl mx-auto shadow-xs leading-normal font-sans text-muted-foreground mt-4 animate-fade-in">
+                          <ShieldCheck className="h-5 w-5 text-primary shrink-0 mt-0.5 animate-pulse" />
+                          <div className="space-y-0.5 text-left">
+                            <strong className="text-foreground block mb-0.5 font-sans text-xs">Local Encrypted Sandbox Mode</strong>
+                            Your FICA document briefs are saved securely inside your local browser memory sandbox because cloud file storage is not configured yet. 
+                            <br className="mb-2 block font-sans text-[11px]" />
+                            <strong className="text-foreground">To enable cloud uploads:</strong> Please ensure your secure database storage buckets are correctly initialized and verified inside your backend database console!
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 )}

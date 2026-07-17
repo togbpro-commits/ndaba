@@ -1113,21 +1113,25 @@ export default function AdminDashboard() {
                           </span>
                           
                           {cs.documents && cs.documents.length > 0 ? (
-                            <div className="flex gap-2.5 overflow-x-auto pb-2 pt-1 scrollbar-thin scrollbar-thumb-border max-w-full">
+                            <div className="grid grid-cols-1 gap-2 pt-1 max-h-[160px] overflow-y-auto pr-1 scrollbar-thin">
                               {cs.documents.map((doc, dIdx) => (
-                                <div key={dIdx} className="flex-shrink-0 bg-background border border-border rounded-xl p-2.5 w-44 flex flex-col justify-between h-20 shadow-sm relative font-sans text-left">
-                                  <div className="flex items-start justify-between gap-1">
-                                    <div className="truncate max-w-[80%]">
-                                      <span className="font-bold text-foreground text-[10px] block truncate" title={doc.name}>{doc.name}</span>
-                                      <span className="text-[8px] text-muted-foreground font-mono block mt-0.5">{doc.size}</span>
+                                <div key={dIdx} className="bg-background border border-border rounded-xl p-2.5 flex items-center justify-between gap-3 shadow-xs font-sans text-left">
+                                  {/* Left: Icon and Details */}
+                                  <div className="flex items-center gap-2.5 truncate max-w-[55%]">
+                                    <div className="p-1.5 bg-primary/5 rounded-lg shrink-0">
+                                      <File className="h-3.5 w-3.5 text-primary shrink-0" />
                                     </div>
-                                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${doc.status === 'Approved' ? 'bg-green-500' : doc.status === 'Rejected' ? 'bg-red-500' : 'bg-yellow-500'}`} title={`Status: ${doc.status}`} />
+                                    <div className="truncate space-y-0.5">
+                                      <span className="font-bold text-foreground text-[10.5px] block truncate" title={doc.name}>{doc.name}</span>
+                                      <span className="text-[9px] text-muted-foreground font-mono block">{doc.size}</span>
+                                    </div>
                                   </div>
 
-                                  <div className="flex items-center justify-between mt-1 pt-1.5 border-t border-border/40">
+                                  {/* Right: Controls & Status */}
+                                  <div className="flex items-center gap-2 shrink-0">
                                     <button 
                                       type="button"
-                                      className="text-primary hover:text-primary/80 flex items-center gap-1 text-[9px] font-mono font-bold cursor-pointer hover:underline"
+                                      className="text-primary hover:text-primary/80 border border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-lg px-2.5 py-1 flex items-center gap-1 text-[9px] font-mono font-bold cursor-pointer transition-all h-7"
                                       onClick={() => handlePreviewDocument(cs.id, cs.client_name, doc.name, doc.url, dIdx)}
                                       title="View document"
                                     >
@@ -1138,7 +1142,13 @@ export default function AdminDashboard() {
                                     <select
                                       value={doc.status}
                                       onChange={(e) => handleUpdateDocumentStatus(cs.id, dIdx, e.target.value as any)}
-                                      className={`text-[8.5px] font-mono font-bold px-1 py-0.5 rounded-md border focus:outline-none cursor-pointer ${doc.status === 'Approved' ? 'bg-green-500/10 text-green-500 border-green-500/20' : doc.status === 'Rejected' ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'}`}
+                                      className={`text-[8.5px] font-mono font-bold px-1.5 py-1 rounded-lg border focus:outline-none cursor-pointer h-7 transition-all ${
+                                        doc.status === 'Approved' 
+                                          ? 'bg-green-500/10 text-green-500 border-green-500/25' 
+                                          : doc.status === 'Rejected' 
+                                            ? 'bg-red-500/10 text-red-500 border-red-500/25' 
+                                            : 'bg-yellow-500/10 text-yellow-500 border-yellow-500/25'
+                                      }`}
                                     >
                                       <option value="Pending">PEND</option>
                                       <option value="Approved">APPR</option>
