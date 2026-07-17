@@ -186,7 +186,7 @@ export default function Track() {
   const [messages, setMessages] = useState<Message[]>([
     {
       sender: 'bot',
-      text: '⚖️ *Ndabas Attorneys - Virtual Assistant*\n\nWelcome to Ndabas Attorneys. I am your automated digital legal assistant. How can I help you today?\n\nReply with *1* to *Onboard as a New Client*\nReply with *2* to *Access an Existing Case (Check Status & Upload Docs)*',
+      text: "⚖️ *Ndabas Attorneys - Virtual Assistant*\n\nWelcome to Ndabas Attorneys. I am your automated digital legal assistant. How can I help you today?\n\nReply with *1* to *Onboard as a New Client*\nReply with *2* to *Access an Existing Case (Check Status & Upload Docs)*",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
