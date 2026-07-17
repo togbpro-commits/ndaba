@@ -1072,8 +1072,15 @@ export default function AdminDashboard() {
               {/* 2. CASE TRACKER */}
               {activeTab === 'cases' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
-                  {cases.map((cs) => (
-                    <div key={cs.id} className="bg-card border border-border p-6 rounded-3xl shadow-lg relative overflow-hidden flex flex-col justify-between max-w-md w-full mx-auto min-h-[480px] hover:shadow-xl transition-all duration-300">
+                  {cases.map((cs) => {
+                    const isAlreadyInDirectory = leads.some(l => 
+                      l.status === 'Client' && 
+                      (l.name.toLowerCase() === cs.client_name.toLowerCase() || 
+                       (l.email && cs.client_email && l.email.toLowerCase() === cs.client_email.toLowerCase()))
+                    );
+
+                    return (
+                      <div key={cs.id} className="bg-card border border-border p-6 rounded-3xl shadow-lg relative overflow-hidden flex flex-col justify-between max-w-md w-full mx-auto min-h-[480px] hover:shadow-xl transition-all duration-300">
                       <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-lavender/5 to-accent/10 blur-xl rounded-full"></div>
                       
                       <div className="space-y-4 relative z-10 flex-grow flex flex-col justify-between">
@@ -1214,15 +1221,25 @@ export default function AdminDashboard() {
                           </button>
 
                           {/* Add to Contact Directory feature icon */}
-                          <button 
-                            type="button"
-                            onClick={() => handleAddAsClient(cs)}
-                            className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer"
-                            title="Register to contact directory"
-                          >
-                            <Users className="h-4 w-4 text-primary" />
-                            <span className="text-[8px] font-mono font-bold tracking-wider uppercase">ADD DIRECTORY</span>
-                          </button>
+                          {isAlreadyInDirectory ? (
+                            <div 
+                              className="flex flex-col items-center gap-1 p-2 rounded-xl text-green-500 cursor-default shrink-0"
+                              title="Verified CRM Contact"
+                            >
+                              <ShieldCheck className="h-4 w-4 text-green-500 animate-none" />
+                              <span className="text-[8px] font-mono font-bold tracking-wider uppercase">IN DIRECTORY</span>
+                            </div>
+                          ) : (
+                            <button 
+                              type="button"
+                              onClick={() => handleAddAsClient(cs)}
+                              className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all cursor-pointer shrink-0"
+                              title="Register to contact directory"
+                            >
+                              <Users className="h-4 w-4 text-primary" />
+                              <span className="text-[8px] font-mono font-bold tracking-wider uppercase">ADD DIRECTORY</span>
+                            </button>
+                          )}
 
                           {/* Delete case feature icon */}
                           <button 
@@ -1244,7 +1261,7 @@ export default function AdminDashboard() {
                         {cs.key_dates && <span className="text-primary font-bold">Notice: {cs.key_dates}</span>}
                       </div>
                     </div>
-                  ))}
+                  ); })}
                   {cases.length === 0 && (
                     <div className="col-span-2 bg-card border border-border p-12 rounded-3xl text-center text-muted-foreground">
                       No active case matters tracked. Convert a lead to Client to open a matter automatically.
@@ -2471,7 +2488,7 @@ export default function AdminDashboard() {
       </AnimatePresence>
 
       {/* Floating Toast Alerts */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2 max-w-sm w-full select-none pointer-events-none">
+      <div className="fixed top-6 right-6 bottom-auto md:top-auto md:bottom-6 md:right-6 z-50 flex flex-col gap-2 max-w-sm w-[calc(100%-3rem)] sm:w-full select-none pointer-events-none">
         <AnimatePresence>
           {toasts.map((t) => (
             <motion.div

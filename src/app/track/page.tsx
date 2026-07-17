@@ -924,7 +924,7 @@ export default function Track() {
       </main>
 
       {/* Floating Toast Alerts */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2 max-w-sm w-full select-none pointer-events-none">
+      <div className="fixed top-6 right-6 bottom-auto md:top-auto md:bottom-6 md:right-6 z-50 flex flex-col gap-2 max-w-sm w-[calc(100%-3rem)] sm:w-full select-none pointer-events-none">
         <AnimatePresence>
           {toasts.map((t) => (
             <motion.div
