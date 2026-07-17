@@ -242,7 +242,7 @@ export async function sendOnboardingEmails(data: EmailPayload) {
             </p>
           </div>
           <div class="footer">
-            <div class="footer-logo">NDABAS ATTORNEYS</div>
+            <div class="footer-logo">NDABA&apos;S ATTORNEYS</div>
             <div class="footer-text">
               Justice House, 2208C Block AA Portion 9, Hammanskraal, Pretoria, 0400<br>
               Tel: 012 711 0427 | Cell: 082 490 6285 | Email: info@ndabasattorneys.co.za

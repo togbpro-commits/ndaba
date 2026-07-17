@@ -594,7 +594,7 @@ export default function AdminDashboard() {
         <header className="max-w-6xl mx-auto w-full px-6 py-6 flex items-center justify-between z-40 select-none">
           <a href="/" className="flex items-center gap-2 font-serif text-lg font-bold tracking-wide">
             <Scale className="h-5 w-5 text-primary" />
-            <span className="bg-gradient-to-r from-primary to-lavender bg-clip-text text-transparent">NDABAS</span>
+            <span className="bg-gradient-to-r from-primary to-lavender bg-clip-text text-transparent">NDABA&apos;S</span>
           </a>
           
           <div className="flex items-center gap-2.5">
@@ -679,10 +679,10 @@ export default function AdminDashboard() {
             {!isSidebarCollapsed ? (
               <a href="/" className="flex items-center gap-2 font-serif text-sm font-bold tracking-wide pl-2">
                 <Scale className="h-5 w-5 text-primary" />
-                <span className="bg-gradient-to-r from-primary to-lavender bg-clip-text text-transparent uppercase tracking-wider font-sans font-bold">NDABAS CRM</span>
+                <span className="bg-gradient-to-r from-primary to-lavender bg-clip-text text-transparent uppercase tracking-wider font-sans font-bold">NDABA&apos;S CRM</span>
               </a>
             ) : (
-              <a href="/" className="mx-auto" title="Ndabas Attorneys CRM">
+              <a href="/" className="mx-auto" title="Ndaba's Attorneys CRM">
                 <Scale className="h-5.5 w-5.5 text-primary animate-none" />
               </a>
             )}
@@ -832,7 +832,7 @@ export default function AdminDashboard() {
             {/* Mobile Brand Logo (Visible on mobile, clickable link back to home '/') */}
             <a href="/" className="md:hidden flex items-center gap-1.5 font-serif text-sm font-bold tracking-wide">
               <Scale className="h-4.5 w-4.5 text-primary shrink-0" />
-              <span className="bg-gradient-to-r from-primary to-lavender bg-clip-text text-transparent uppercase tracking-wider font-sans font-extrabold text-[12px]">NDABAS CRM</span>
+              <span className="bg-gradient-to-r from-primary to-lavender bg-clip-text text-transparent uppercase tracking-wider font-sans font-extrabold text-[12px]">NDABA&apos;S CRM</span>
             </a>
           </div>
           <div className="flex items-center gap-4 text-xs">
@@ -2348,7 +2348,7 @@ export default function AdminDashboard() {
 
       {/* STICKY FOOTER PANEL */}
       <footer className="hidden md:flex h-16 shrink-0 border-t border-border/40 bg-card select-none items-center justify-between px-6 font-mono text-[9px] text-muted-foreground/60 font-mono">
-        <span>© 2026 NDABAS ATTORNEYS CRM. ALL RIGHTS RESERVED.</span>
+        <span>© 2026 NDABA&apos;S ATTORNEYS CRM. ALL RIGHTS RESERVED.</span>
         <span>POPIA & LPC COMPLIANT.</span>
       </footer>
 

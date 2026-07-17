@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="space-y-2">
           <div className="flex items-center justify-center sm:justify-start gap-2 font-serif text-sm font-bold text-foreground">
             <Scale className="h-4 w-4 text-primary" />
-            <span className="bg-gradient-to-r from-primary to-lavender bg-clip-text text-transparent">NDABAS ATTORNEYS</span>
+            <span className="bg-gradient-to-r from-primary to-lavender bg-clip-text text-transparent">NDABA&apos;S ATTORNEYS</span>
           </div>
           <span>Trading from &quot;Justice House&quot; in Hammanskraal, Gauteng</span>
         </div>

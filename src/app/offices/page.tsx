@@ -10,7 +10,7 @@ export default function OfficesPage() {
       <header className="max-w-6xl mx-auto w-full px-6 py-6 flex items-center justify-between select-none">
         <Link href="/" className="flex items-center gap-2 font-serif text-lg font-bold tracking-wide">
           <Scale className="h-5 w-5 text-primary" />
-          <span className="bg-gradient-to-r from-primary to-lavender bg-clip-text text-transparent">NDABAS</span>
+          <span className="bg-gradient-to-r from-primary to-lavender bg-clip-text text-transparent">NDABA&apos;S</span>
         </Link>
         <Link 
           href="/" 
