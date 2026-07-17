@@ -310,11 +310,15 @@ async function main() {
       } else {
         await emailField.fill(ADMIN_EMAIL);
         await passwordField.fill(ADMIN_PASSWORD);
-        await Promise.all([
-          page.waitForLoadState('networkidle'),
-          submitButton.click(),
-        ]);
-        await page.waitForTimeout(1000); // let dashboard settle
+        await submitButton.click();
+        await page.waitForTimeout(2500); // let request complete & redirect settle
+        
+        // Error reporter check to see why login might fail (e.g. Clerk OTP/MFA limits)
+        const errorMsgElement = page.locator('.text-red-500, [class*="error" i]').first();
+        if (await errorMsgElement.count() && await errorMsgElement.isVisible()) {
+          const text = await errorMsgElement.innerText();
+          console.warn(`  ! Sign-in failed with error message: "${text.trim()}"`);
+        }
 
         await page.screenshot({ path: path.join(OUT_DIR, 'dashboard-landing-overview.png'), fullPage: true });
         console.log('  ✓ dashboard-landing-overview.png (Secure admin entry successful)');
